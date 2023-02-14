@@ -154,6 +154,6 @@ void ComputePipeline::resizeThis(uint32_t size) noexcept
     };
 
     VkPipeline compPipeLine;
-    vkCreateComputePipelines(tmpDevice_, nullptr, 1, &ComputePipelineCreateInfo, nullptr, &compPipeLine);
+    vkCreateComputePipelines(tmpDevice_, compPipelineCache, 1, &ComputePipelineCreateInfo, nullptr, &compPipeLine);
     return compPipeLine;
 }

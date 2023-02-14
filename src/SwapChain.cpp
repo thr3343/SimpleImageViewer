@@ -14,7 +14,7 @@ auto SwapChain::getSwapChainImages(uint32_t size) -> std::array<VkImage, Frames>
 constexpr uint32_t a = 2;
   VkImageCreateInfo VkImageCreateInfo{
     .sType=VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-    .flags=VK_IMAGE_CREATE_EXTENDED_USAGE_BIT,
+    // .flags=VK_IMAGE_CREATE_EXTENDED_USAGE_BIT,
     .imageType=VK_IMAGE_TYPE_2D,
     .format=VK_FORMAT_B8G8R8A8_SRGB,
     .extent{width,height,1},
@@ -22,7 +22,7 @@ constexpr uint32_t a = 2;
     .arrayLayers=1,
     .samples=VK_SAMPLE_COUNT_1_BIT,
     .tiling=VK_IMAGE_TILING_OPTIMAL,
-    .usage=VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_STORAGE_BIT,
+    .usage=VK_IMAGE_USAGE_TRANSFER_DST_BIT,
     .queueFamilyIndexCount=1,
     .pQueueFamilyIndices=&a,
     .initialLayout=VK_IMAGE_LAYOUT_PREINITIALIZED
@@ -133,10 +133,10 @@ auto SwapChain::createSwapChain()->VkSwapchainKHR
       .imageColorSpace  = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
       .imageExtent      = extent.currentExtent,
       .imageArrayLayers = 1,
-      .imageUsage       = VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_STORAGE_BIT,
+      .imageUsage       = VK_IMAGE_USAGE_TRANSFER_DST_BIT,
 
       .imageSharingMode      = VK_SHARING_MODE_EXCLUSIVE, //Is concurrent even needed in many cases...
-      .queueFamilyIndexCount = 0,
+      .queueFamilyIndexCount = 1,
       .pQueueFamilyIndices   = &a,
       
 
@@ -182,8 +182,8 @@ auto SwapChain::createSwapChain()->VkSwapchainKHR
 //       .pSubpasses      = &subpass,
 //    };
  
-//   return doPointerAlloc5<VkRenderPass>(&vkRenderPassCreateInfo1, vkCreateRenderPass);
-// }
+  return doPointerAlloc5<VkRenderPass>(&vkRenderPassCreateInfo1, vkCreateRenderPass);
+}
 
 
   auto SwapChain::createFramebuffers() -> VkFramebuffer
@@ -195,7 +195,7 @@ auto SwapChain::createSwapChain()->VkSwapchainKHR
     VkFramebufferAttachmentImageInfo FramebufferAttachmentImage
     {
       .sType  = VK_STRUCTURE_TYPE_FRAMEBUFFER_ATTACHMENT_IMAGE_INFO,
-      .usage  = VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_STORAGE_BIT, //Nvidia Driver bug with Usages/Varients is now fixed in an eailer 473.** Driver Branch and does/no longer needs an offset tp be corrected manually
+      .usage  = VK_IMAGE_USAGE_TRANSFER_DST_BIT, //Nvidia Driver bug with Usages/Varients is now fixed in an eailer 473.** Driver Branch and does/no longer needs an offset tp be corrected manually
       .width  = width,
       .height = height,
       .layerCount=1,

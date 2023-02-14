@@ -111,7 +111,7 @@ auto ImgLoader::loadImg(VkQueue queue) ->vmaImage
 
     constexpr VkOffset2D Offs{width, height};
 
-    auto stagingBuffer = allocBuff(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT|VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    auto stagingBuffer = allocBuff(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT|VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true);
     //memSys::addMappedSection(VmaAllocation, imageSize);
     vmaMapMemory(this->a, stagingBuffer.alloc, (&data));
     {
@@ -128,7 +128,7 @@ auto ImgLoader::loadImg(VkQueue queue) ->vmaImage
 
    
     auto vkImage= allocImg(defres, imageSize, VK_IMAGE_USAGE_TRANSFER_SRC_BIT|VK_IMAGE_USAGE_TRANSFER_DST_BIT);
-    VkCommSet commandBufferSets{*this,1}; 
+    VkCommSet commandBufferSets{*this, 2}; 
     return copyImage2Buffer(vkImage, commandBufferSets, stagingBuffer, queue);
    
 

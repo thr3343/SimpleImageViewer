@@ -31,7 +31,7 @@ struct SwapChain : Tmp
     VkSwapchainKHR swapchain;
     VkPresentModeKHR presentMode;
     std::array<VkImage, Frames> image;
-     std::array<VkImageView, Frames> imageViews;
+    //  std::array<VkImageView, Frames> imageViews;
      explicit SwapChain(Tmp swap)
          :
 
@@ -41,7 +41,7 @@ struct SwapChain : Tmp
         //    frameBuffer(createFramebuffers()), 
            swapchain(createSwapChain()),
            image(getSwapChainImages(Frames)),
-           imageViews(createImageViews(image)), SwapChain::Tmp(swap){}; // TODO(Vcmp): use Move Construction to avoid duplciating the handles: (Minor Mem Leak)
+           SwapChain::Tmp(swap){}; // TODO(Vcmp): use Move Construction to avoid duplciating the handles: (Minor Mem Leak)
 
      auto handleSwapChainCapabilities() -> SwapchainCapabilities;
      auto createSwapChain() -> VkSwapchainKHR;
@@ -60,7 +60,7 @@ struct SwapChain : Tmp
        
        for (auto a=0;a<Frames;a++) 
        {
-            vkDestroyImageView(tmpDevice_, imageViews[a], nullptr);
+            // vkDestroyImageView(tmpDevice_, imageViews[a], nullptr);
             // vkDestroyImage(tmpDevice_, image[a], nullptr);
        }
     //    vkDestroyRenderPass(tmpDevice_, renderPass, nullptr);

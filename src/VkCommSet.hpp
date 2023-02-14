@@ -7,10 +7,12 @@ struct VkCommSet:Tmp
 {
     VkCommandPool commandPool;
     VkCommandBuffer commandBuffer;
+    VkFence fence=setupFence();
 
     VkCommandPool genCommPool(uint32_t);
     VkCommandBuffer doGenCommnd(VkCommandPool);
-    constexpr explicit VkCommSet(Tmp tmp, uint32_t i=2): commandPool(genCommPool(i)),commandBuffer(doGenCommnd(commandPool)), Tmp{tmp} {};
+     explicit VkCommSet(Tmp tmp, uint32_t i=2): commandPool(genCommPool(i)),commandBuffer(doGenCommnd(commandPool)), Tmp{tmp} {};
     void beginSingleTimeCommands() const;
-    void endSingleTimeCommands(VkQueue queue, bool=true, bool=false) const;
+    void endSingleTimeCommands(VkQueue queue, bool submit=true, bool wait=false) const;
+    [[nodiscard]] auto setupFence() const noexcept -> VkFence;
 };

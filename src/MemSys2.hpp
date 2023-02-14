@@ -1,6 +1,7 @@
 #pragma once
 #include "defs.tpp"
 #include "Vkbase.hpp"
+#include <cstddef>
 #include <cstdint>
 #include <vulkan/vulkan_core.h>
 
@@ -10,7 +11,7 @@ constexpr VkImageSubresourceLayers subresource = {.aspectMask = VK_IMAGE_ASPECT_
 	    .baseArrayLayer = 0,
 	    .layerCount = 1,
         };
-
+constexpr VkDeviceSize defSize=static_cast<const VkDeviceSize>(width*height)*4Ul;
 struct vmaBuffer
 {
   VkBuffer buff;
@@ -39,5 +40,5 @@ struct MemSys2:Tmp
 
     [[nodiscard]] auto setupAlloc(uint32_t) const -> VmaAllocator;
     [[nodiscard]] auto allocBuff(VkDeviceSize, VkBufferUsageFlags, VkMemoryPropertyFlags, bool=false) const -> vmaBuffer;
-    [[nodiscard]] auto allocImg(VkExtent3D =defres, uint32_t=width*height*4, VkImageUsageFlags=VK_IMAGE_USAGE_TRANSFER_SRC_BIT|VK_IMAGE_USAGE_TRANSFER_DST_BIT) const -> vmaImage;
+    [[nodiscard]] auto allocImg(VkExtent3D =defres, uint32_t=defSize, VkImageUsageFlags=VK_IMAGE_USAGE_TRANSFER_SRC_BIT|VK_IMAGE_USAGE_TRANSFER_DST_BIT) const -> vmaImage;
 };

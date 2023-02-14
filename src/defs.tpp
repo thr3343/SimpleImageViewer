@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include <vulkan/vulkan_core.h>
+
 
 
 constexpr uint8_t Frames = 8;

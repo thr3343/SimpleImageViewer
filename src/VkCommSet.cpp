@@ -3,7 +3,20 @@
 
 #include <vulkan/vulkan_core.h>
 
- 
+
+
+auto VkCommSet::setupFence() const noexcept -> VkFence
+{
+      VkFenceCreateInfo fenceInfo
+     {
+          .sType=(VK_STRUCTURE_TYPE_FENCE_CREATE_INFO),
+          //.flags=(VK_FENCE_CREATE_SIGNALED_BIT),
+     };
+
+     
+     return doPointerAlloc5<VkFence>(&fenceInfo, vkCreateFence);
+}
+
 void VkCommSet::beginSingleTimeCommands() const
 {
      VkCommandBufferBeginInfo beginInfo1 = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
@@ -31,7 +44,7 @@ VkCommandPool VkCommSet::genCommPool(uint32_t QueueFamilyIndex)
     .sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
     .pNext            = nullptr,
     .flags=VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-    .queueFamilyIndex = 2,
+    .queueFamilyIndex = QueueFamilyIndex,
   };
  
   return doPointerAlloc5<VkCommandPool>(&poolInfo, vkCreateCommandPool);
@@ -46,7 +59,7 @@ void VkCommSet::endSingleTimeCommands(VkQueue queue, bool submit, bool wait) con
           .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO, .pNext = VK_NULL_HANDLE, .commandBufferCount = ( 1 ), .pCommandBuffers = &commandBuffer
   };
 //   a = ( a ^ 1 );
-  vkQueueSubmit( queue, 1, &submitInfo1, VK_NULL_HANDLE );
-  if(wait) (vkQueueWaitIdle( queue ));
+  vkQueueSubmit( queue, 1, &submitInfo1, !wait?VK_NULL_HANDLE:fence );
+  if(wait) (vkWaitForFences( tmpDevice_, 1, &fence, false, -1 ));
 //   vkResetCommandPool( device, ( commandPool2 ), VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT );
 }

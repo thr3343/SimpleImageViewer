@@ -32,12 +32,14 @@ namespace
 uint32_t i;
 uint32_t tmSecs;
 
-[[gnu::pure]] auto main() -> int
+auto main() -> int
 {
     // vmaImage defImg=imgLoader.allocImg();
 auto TImg2=imgLoader.loadImg(vkbase.PresentQueue.queue);
     // imgLoader.vkRecImg(defImg.img, renderer2::currentFrame, vkbase.GraphicsQueue);
-printf("OK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+// printf("OK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+// printf("Size: %llu\n", width*height*4);
+// printf("Size: %llu\n", defSize);
     computePipeline.updateDescriptorSetArray(computePipeline.compSSBO.size);
     computePipeline.commSet.beginSingleTimeCommands();
 
@@ -57,20 +59,12 @@ VkBufferImageCopy bufferImageCopy
 
     vkCmdCopyImageToBuffer(computePipeline.commSet.commandBuffer, imgLoader.vmaImg.img, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, computePipeline.compSSBO.buff, 1, &bufferImageCopy);
 
-    vkCmdDispatch(computePipeline.commSet.commandBuffer, width*height*128, 0, 0);
+    vkCmdDispatch(computePipeline.commSet.commandBuffer, ((width * height)/32/128)+1, 1, 1);
     vkQueueWaitIdle(vkbase.PresentQueue.queue);
     imgLoader.transitionImageLayout(computePipeline.commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, TImg2.img);
   //  vkCmdCopyBufferToImage(computePipeline.commSet.commandBuffer, computePipeline.compSSBO.buff, TImg2.img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
     // imgLoader.transitionImageLayout(computePipeline.commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, imgLoader.vmaImg.img);
-  VkImageCopy copyRegion
-    {
-      .srcSubresource=subresource,
-      .srcOffset=VkOffset3D{0, 0, 0},
-      .dstSubresource=subresource,
-	    .dstOffset=VkOffset3D{0, 0, 0},
-      .extent=defres
-
-    };
+ 
       for(const VkImage &img : swapChain.image) {
         imgLoader.transitionImageLayout(computePipeline.commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, img);
     vkCmdCopyBufferToImage(computePipeline.commSet.commandBuffer, computePipeline.compSSBO.buff, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
@@ -78,7 +72,7 @@ VkBufferImageCopy bufferImageCopy
         // imgLoader.transitionImageLayout(computePipeline.commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, TImg2.img);
 
   }
-    computePipeline.commSet.endSingleTimeCommands(vkbase.PresentQueue.queue, true);
+    computePipeline.commSet.endSingleTimeCommands(vkbase.PresentQueue.queue, true, true);
     while(IsWindow(vkbase.window))
     {
         static LPMSG msg;
