@@ -16,7 +16,7 @@ auto ImgLoader::genCommPool(uint32_t QueuefamilyIndex) const -> VkCommandPool
     .sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
     .pNext            = nullptr,
     .flags=VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-    .queueFamilyIndex = QueuefamilyIndex,
+    .queueFamilyIndex = 2,
   };
   return doPointerAlloc5<VkCommandPool>( &poolInfo, vkCreateCommandPool );
  
@@ -168,9 +168,10 @@ void ImgLoader::transitionImageLayout( VkCommandBuffer commandBuffer, VkFormat f
     
     case VK_IMAGE_LAYOUT_UNDEFINED: barrier.srcAccessMask = ( VK_ACCESS_TRANSFER_READ_BIT ); break;
 
-    case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL: barrier.srcAccessMask = VK_ACCESS_NONE; break;
+    case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL: barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT; break;
+    case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL: barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT; break;
 
-    case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR: barrier.srcAccessMask = VK_ACCESS_NONE; break;
+    case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR: barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT; break;
     case VK_IMAGE_LAYOUT_GENERAL: barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT; break;
 
     default:  printf( "Unsupported layout transition" ), exit(1);
@@ -205,15 +206,15 @@ void ImgLoader::transitionImageLayout( VkCommandBuffer commandBuffer, VkFormat f
     case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
     {
         barrier.subresourceRange.aspectMask = ( VK_IMAGE_ASPECT_COLOR_BIT );
-        barrier.dstAccessMask = ( VK_ACCESS_NONE );
-        sourceStage           = VK_PIPELINE_STAGE_NONE;
-        destinationStage      = VK_PIPELINE_STAGE_NONE;
+        barrier.dstAccessMask = ( VK_ACCESS_TRANSFER_READ_BIT );
+        sourceStage           = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        destinationStage      = VK_PIPELINE_STAGE_TRANSFER_BIT;
         break;
     }
     case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:
     {
         barrier.subresourceRange.aspectMask = ( VK_IMAGE_ASPECT_COLOR_BIT );
-        barrier.dstAccessMask = ( VK_ACCESS_NONE );
+        barrier.dstAccessMask = ( VK_ACCESS_TRANSFER_READ_BIT );
         sourceStage           = VK_PIPELINE_STAGE_TRANSFER_BIT;
         destinationStage      = VK_PIPELINE_STAGE_TRANSFER_BIT;
         break;

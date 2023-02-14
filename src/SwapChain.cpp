@@ -11,10 +11,10 @@ auto SwapChain::getSwapChainImages(uint32_t size) -> std::array<VkImage, Frames>
 {
   printf( "get SwapChain Images\n");
   std::array<VkImage, Frames> image;
-constexpr uint32_t a = 0;
+constexpr uint32_t a = 2;
   VkImageCreateInfo VkImageCreateInfo{
     .sType=VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-    // .flags=VK_IMAGE_CREATE_BLOCK_TEXEL_VIEW_COMPATIBLE_BIT|VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT,
+    .flags=VK_IMAGE_CREATE_EXTENDED_USAGE_BIT,
     .imageType=VK_IMAGE_TYPE_2D,
     .format=VK_FORMAT_B8G8R8A8_SRGB,
     .extent{width,height,1},
@@ -22,10 +22,10 @@ constexpr uint32_t a = 0;
     .arrayLayers=1,
     .samples=VK_SAMPLE_COUNT_1_BIT,
     .tiling=VK_IMAGE_TILING_OPTIMAL,
-    .usage=VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+    .usage=VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_STORAGE_BIT,
     .queueFamilyIndexCount=1,
     .pQueueFamilyIndices=&a,
-    .initialLayout=VK_IMAGE_LAYOUT_PREINITIALIZED
+    .initialLayout=VK_IMAGE_LAYOUT_UNDEFINED
   };
   
   vkCreateImage(tmpDevice_, &VkImageCreateInfo, nullptr, image.data());
@@ -133,7 +133,7 @@ auto SwapChain::createSwapChain()->VkSwapchainKHR
       .imageColorSpace  = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
       .imageExtent      = extent.currentExtent,
       .imageArrayLayers = 1,
-      .imageUsage       = VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+      .imageUsage       = VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_STORAGE_BIT,
 
       .imageSharingMode      = VK_SHARING_MODE_EXCLUSIVE, //Is concurrent even needed in many cases...
       .queueFamilyIndexCount = 0,
@@ -151,39 +151,39 @@ auto SwapChain::createSwapChain()->VkSwapchainKHR
     return doPointerAlloc5<VkSwapchainKHR>(&createInfo, vkCreateSwapchainKHR);
 }
 
-auto SwapChain::createRenderPass(VkImageLayout initial, bool load) -> VkRenderPass
-{
+// auto SwapChain::createRenderPass(VkImageLayout initial, bool load) -> VkRenderPass
+// {
 
-   printf( "Creating RenderPass\n");
-  VkAttachmentDescription colorAttachment
-  {
-    .format         = VK_FORMAT_B8G8R8A8_SRGB,  // SwapChainSupportDetails::swapChainImageFormat,
-    .samples        = VK_SAMPLE_COUNT_1_BIT,
-    .loadOp         = VK_ATTACHMENT_LOAD_OP_NONE_EXT,
-    .storeOp        = VK_ATTACHMENT_STORE_OP_NONE, //Interestign Bugs: VK_ATTACHMENT_STORE_OP_STORE_DONT_CARE
-    .stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_NONE_EXT,
-    .stencilStoreOp = VK_ATTACHMENT_STORE_OP_NONE,
-    .initialLayout  = initial,
-    .finalLayout    = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-  };
-  VkAttachmentReference colorAttachmentRef{0, VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL};
-  VkSubpassDescription  subpass{ .pipelineBindPoint    = VK_PIPELINE_BIND_POINT_GRAPHICS,
-                                                  .inputAttachmentCount = 1,
-                                                  .pInputAttachments    = &colorAttachmentRef };
+//    printf( "Creating RenderPass\n");
+//   VkAttachmentDescription colorAttachment
+//   {
+//     .format         = VK_FORMAT_B8G8R8A8_SRGB,  // SwapChainSupportDetails::swapChainImageFormat,
+//     .samples        = VK_SAMPLE_COUNT_1_BIT,
+//     .loadOp         = VK_ATTACHMENT_LOAD_OP_NONE_EXT,
+//     .storeOp        = VK_ATTACHMENT_STORE_OP_NONE, //Interestign Bugs: VK_ATTACHMENT_STORE_OP_STORE_DONT_CARE
+//     .stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_NONE_EXT,
+//     .stencilStoreOp = VK_ATTACHMENT_STORE_OP_NONE,
+//     .initialLayout  = initial,
+//     .finalLayout    = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+//   };
+//   VkAttachmentReference colorAttachmentRef{0, VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL};
+//   VkSubpassDescription  subpass{ .pipelineBindPoint    = VK_PIPELINE_BIND_POINT_GRAPHICS,
+//                                                   .inputAttachmentCount = 1,
+//                                                   .pInputAttachments    = &colorAttachmentRef };
 
  
 
-   VkRenderPassCreateInfo vkRenderPassCreateInfo1
-   {
-      .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-      .attachmentCount = 1,
-      .pAttachments    = &colorAttachment,
-      .subpassCount    = 1,
-      .pSubpasses      = &subpass,
-   };
+//    VkRenderPassCreateInfo vkRenderPassCreateInfo1
+//    {
+//       .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+//       .attachmentCount = 1,
+//       .pAttachments    = &colorAttachment,
+//       .subpassCount    = 1,
+//       .pSubpasses      = &subpass,
+//    };
  
-  return doPointerAlloc5<VkRenderPass>(&vkRenderPassCreateInfo1, vkCreateRenderPass);
-}
+//   return doPointerAlloc5<VkRenderPass>(&vkRenderPassCreateInfo1, vkCreateRenderPass);
+// }
 
 
   auto SwapChain::createFramebuffers() -> VkFramebuffer
@@ -195,7 +195,7 @@ auto SwapChain::createRenderPass(VkImageLayout initial, bool load) -> VkRenderPa
     VkFramebufferAttachmentImageInfo FramebufferAttachmentImage
     {
       .sType  = VK_STRUCTURE_TYPE_FRAMEBUFFER_ATTACHMENT_IMAGE_INFO,
-      .usage  = VK_IMAGE_USAGE_TRANSFER_DST_BIT, //Nvidia Driver bug with Usages/Varients is now fixed in an eailer 473.** Driver Branch and does/no longer needs an offset tp be corrected manually
+      .usage  = VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_STORAGE_BIT, //Nvidia Driver bug with Usages/Varients is now fixed in an eailer 473.** Driver Branch and does/no longer needs an offset tp be corrected manually
       .width  = width,
       .height = height,
       .layerCount=1,

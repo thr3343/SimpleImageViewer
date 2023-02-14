@@ -1,6 +1,7 @@
 #pragma once
 #include "defs.tpp"
 #include "TMp.hpp"
+#include "VkCommSet.hpp"
 #include "MemSys2.hpp"
 
 
@@ -9,10 +10,10 @@
 
 struct ComputePipeline : MemSys2
 {
-    explicit ComputePipeline(MemSys2 const& Memsys) noexcept : MemSys2(Memsys){};
-    
+    explicit ComputePipeline(MemSys2 const& Memsys) noexcept :commSet{Memsys, Memsys.q.queuefamilyVarient}, MemSys2(Memsys){};
+    VkCommSet commSet;
     VkDescriptorSetLayout compDescriptorSetLayout=setupDescriptorSetLayout();
-    vmaBuffer compSSBO=allocBuff(width*height*4,VK_BUFFER_USAGE_STORAGE_BUFFER_BIT|VK_BUFFER_USAGE_TRANSFER_DST_BIT,VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+    vmaBuffer compSSBO=allocBuff(width*height*4,VK_BUFFER_USAGE_STORAGE_BUFFER_BIT|VK_BUFFER_USAGE_TRANSFER_SRC_BIT|VK_BUFFER_USAGE_TRANSFER_DST_BIT,VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     VkPipelineLayout compPipelineLayout=setupLayout();
     VkPipeline compPipeline=setupPipeline();
     VkPipelineCache compPipelineCache;

@@ -33,6 +33,7 @@
      VkPipelineLayoutCreateInfo pipelineLayoutInfo
      {
             .sType=VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+            .setLayoutCount=1,
             .pSetLayouts=&compDescriptorSetLayout,
      };
 
@@ -53,6 +54,7 @@
                 {
                     .sType=VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
                     .maxSets=1,
+                    .poolSizeCount=1,
                     .pPoolSizes=&poolSizes,
                 };
 
@@ -66,6 +68,7 @@
             {
                 .sType=VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
                 .descriptorPool=compDescriptorPool,
+                .descriptorSetCount=1,
                 .pSetLayouts=&compDescriptorSetLayout,
             };
 
@@ -124,7 +127,7 @@
     constexpr VkShaderModuleCreateInfo shaderModuleCreateInfo 
     {
         .sType=VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-        .codeSize=ax.size(),
+        .codeSize=ax.size()*sizeof(uint32_t),
         .pCode=ax.data()
 
     };

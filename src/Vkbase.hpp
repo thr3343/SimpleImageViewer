@@ -38,7 +38,7 @@ struct Vkbase : Win
   VkPhysicalDevice physDevice = createPhysDevice();
   VkDevice device = createDevice();
   // DiscreteQueue GraphicsQueue = getQueue(0);
-  DiscreteQueue TransferQueue = getQueue(1);
+  // DiscreteQueue TransferQueue = getQueue(1);
   DiscreteQueue PresentQueue = getQueue(2);
 
   [[nodiscard]] auto getVer() -> uint32_t;

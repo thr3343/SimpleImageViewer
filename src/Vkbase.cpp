@@ -7,7 +7,7 @@
 #include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_win32.h>
 
-constexpr bool ENABLE_VALIDATION_LAYERS = false;
+constexpr bool ENABLE_VALIDATION_LAYERS = true;
 
 constexpr auto *validationLayers = "VK_LAYER_KHRONOS_validation";
 constexpr auto extensions= { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME};
@@ -151,15 +151,15 @@ auto Vkbase::createDevice() -> VkDevice
 //         1,
 //         &priority,
 //  };
- const VkDeviceQueueCreateInfo deviceQueueCreateInfo2 
- {
-        VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-        nullptr,
-        0,
-        1,
-        1,
-        &priority,
- }; 
+//  const VkDeviceQueueCreateInfo deviceQueueCreateInfo2 
+//  {
+//         VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+//         nullptr,
+//         0,
+//         1,
+//         1,
+//         &priority,
+//  }; 
  const VkDeviceQueueCreateInfo deviceQueueCreateInfo3 
  {
         VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
@@ -169,7 +169,7 @@ auto Vkbase::createDevice() -> VkDevice
         1,
         &priority,
  };
-auto queueSetInitList ={deviceQueueCreateInfo2, deviceQueueCreateInfo3};
+auto queueSetInitList ={deviceQueueCreateInfo3};
  static VkPhysicalDeviceVulkan13Features vk13F
   {
     .sType=VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
@@ -202,7 +202,7 @@ auto queueSetInitList ={deviceQueueCreateInfo2, deviceQueueCreateInfo3};
         .sType=VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
         .pNext=&deviceFeatures2,
         // .flags=0,
-        .queueCreateInfoCount=2,
+        .queueCreateInfoCount=1,
         .pQueueCreateInfos=queueSetInitList.begin(),
         // .enabledLayerCount=1,
         .ppEnabledLayerNames= ENABLE_VALIDATION_LAYERS  ? &validationLayers : nullptr,

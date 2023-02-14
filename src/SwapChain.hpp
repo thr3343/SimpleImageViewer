@@ -55,7 +55,7 @@ struct SwapChain : Tmp
      [[nodiscard]] auto createImageViews(std::array<VkImage, Frames> image)
          -> std::array<VkImageView, Frames>;
 
-     [[gnu::cold]] ~SwapChain() 
+     [[gnu::cold, gnu::noreturn]] ~SwapChain() 
      {
        
        for (auto a=0;a<Frames;a++) 

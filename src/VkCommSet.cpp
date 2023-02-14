@@ -31,7 +31,7 @@ VkCommandPool VkCommSet::genCommPool(uint32_t QueueFamilyIndex)
     .sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
     .pNext            = nullptr,
     .flags=VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-    .queueFamilyIndex = QueueFamilyIndex,
+    .queueFamilyIndex = 2,
   };
  
   return doPointerAlloc5<VkCommandPool>(&poolInfo, vkCreateCommandPool);
