@@ -33,42 +33,12 @@ namespace
 uint32_t i;
 uint32_t tmSecs;
 
+
+
 auto main() -> int
 {
-
-    computePipeline.commSet.beginSingleTimeCommands();
-    imgLoader.loadImg(computePipeline.commSet, vkbase.PresentQueue.queue, computePipeline.compSSBO);
-
-    vkCmdBindPipeline(computePipeline.commSet.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, computePipeline.compPipeline);
-    vkCmdBindDescriptorSets(computePipeline.commSet.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, computePipeline.compPipelineLayout, 0, 1, &computePipeline.compDescriptorSet, 0, nullptr);
-
-
-constexpr uint32_t rowPitch = 0;
-constexpr VkBufferImageCopy bufferImageCopy
-{
-  .bufferOffset=0,
-  .bufferImageHeight=height,
-  .imageExtent=defres,
-  .bufferRowLength=rowPitch,
-  .imageOffset=0,
-  .imageSubresource=subresource
-};
-
-    // vkCmdCopyImageToBuffer(computePipeline.commSet.commandBuffer, TImg2.img, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, computePipeline.compSSBO.buff, 1, &bufferImageCopy);
+    computePipeline.BGR2RGBSwizzle(imgLoader, vkbase.PresentQueue.queue, swapChain.image);
     
-
-    uint64_t scaleX=(defSize/4/32/128);  
-    vkCmdDispatch(computePipeline.commSet.commandBuffer, scaleX, 1, 1);
-
-
-
-      for(const VkImage &img : swapChain.image) 
-      {
-        imgLoader.transitionImageLayout(computePipeline.commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, img);
-        vkCmdCopyBufferToImage(computePipeline.commSet.commandBuffer, computePipeline.compSSBO.buff, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
-        imgLoader.transitionImageLayout(computePipeline.commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, img);
-      }
-    computePipeline.commSet.endSingleTimeCommands(vkbase.PresentQueue.queue, true, false);
     while(IsWindow(vkbase.window))
     {
         static LPMSG msg;

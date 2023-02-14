@@ -3,6 +3,8 @@
 #include "TMp.hpp"
 #include "VkCommSet.hpp"
 #include "MemSys2.hpp"
+#include "ImgLoader.hpp"
+#include <array>
 
 
 
@@ -16,7 +18,7 @@ struct ComputePipeline : MemSys2
     vmaBuffer compSSBO=allocBuff(defSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT|VK_BUFFER_USAGE_TRANSFER_SRC_BIT|VK_BUFFER_USAGE_TRANSFER_DST_BIT,VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, true);
     VkPipelineLayout compPipelineLayout=setupLayout();
     VkPipeline compPipeline=setupPipeline();
-    VkPipelineCache compPipelineCache;
+    // VkPipelineCache compPipelineCache;
 
     VkDescriptorPool compDescriptorPool=setupDescriptorPool();
     VkDescriptorSet compDescriptorSet=allocDescriptorSet();
@@ -28,4 +30,6 @@ struct ComputePipeline : MemSys2
     void updateDescriptorSetArray(uint32_t=defSize) const noexcept;
     void resizeThis(uint32_t=defSize) noexcept;
     [[gnu::pure]] void reLoad();
+    
+    [[gnu::pure]] void BGR2RGBSwizzle(ImgLoader &imgLoader, VkQueue queue, std::array<VkImage, Frames> image) const noexcept;
 };

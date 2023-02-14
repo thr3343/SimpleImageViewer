@@ -3,6 +3,7 @@
 #include <vk_mem_alloc.h>
 #include "Swizzle.inl"
 
+
 [[nodiscard]] auto ComputePipeline::setupDescriptorSetLayout() const -> VkDescriptorSetLayout
 {
 
@@ -119,6 +120,43 @@ void ComputePipeline::resizeThis(uint32_t size) noexcept
      
 }
 
+void ComputePipeline::BGR2RGBSwizzle(ImgLoader &imgLoader, VkQueue queue, std::array<VkImage, Frames> image) const noexcept
+{
+    commSet.beginSingleTimeCommands();
+    imgLoader.loadImg(commSet, queue, compSSBO);
+
+    vkCmdBindPipeline(commSet.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, compPipeline);
+    vkCmdBindDescriptorSets(commSet.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, compPipelineLayout, 0, 1, &compDescriptorSet, 0, nullptr);
+
+
+    constexpr uint32_t rowPitch = 0;
+    constexpr VkBufferImageCopy bufferImageCopy
+    {
+        .bufferOffset=0,
+        .bufferImageHeight=height,
+        .imageExtent=defres,
+        .bufferRowLength=rowPitch,
+        .imageOffset=0,
+        .imageSubresource=subresource
+    };
+
+    // vkCmdCopyImageToBuffer(commSet.commandBuffer, TImg2.img, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, compSSBO.buff, 1, &bufferImageCopy);
+    
+
+    uint64_t scaleX=(defSize/4/32/128);  
+    vkCmdDispatch(commSet.commandBuffer, scaleX, 1, 1);
+
+
+    // #pragma nounroll
+    for(const VkImage &img : image) 
+    {
+    imgLoader.transitionImageLayout(commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, img);
+    vkCmdCopyBufferToImage(commSet.commandBuffer, compSSBO.buff, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
+    imgLoader.transitionImageLayout(commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, img);
+    }
+    commSet.endSingleTimeCommands(queue, true, false);
+}
+
 [[nodiscard]] auto ComputePipeline::setupPipeline() const -> VkPipeline
 {
 
@@ -154,6 +192,6 @@ void ComputePipeline::resizeThis(uint32_t size) noexcept
     };
 
     VkPipeline compPipeLine;
-    vkCreateComputePipelines(tmpDevice_, compPipelineCache, 1, &ComputePipelineCreateInfo, nullptr, &compPipeLine);
+    vkCreateComputePipelines(tmpDevice_, nullptr, 1, &ComputePipelineCreateInfo, nullptr, &compPipeLine);
     return compPipeLine;
 }
