@@ -181,9 +181,9 @@ auto SwapChain::createSwapChain()->VkSwapchainKHR
 //       .subpassCount    = 1,
 //       .pSubpasses      = &subpass,
 //    };
- 
-  return doPointerAlloc5<VkRenderPass>(&vkRenderPassCreateInfo1, vkCreateRenderPass);
-}
+//  
+//   return doPointerAlloc5<VkRenderPass>(&vkRenderPassCreateInfo1, vkCreateRenderPass);
+// }
 
 
   auto SwapChain::createFramebuffers() -> VkFramebuffer

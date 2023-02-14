@@ -82,19 +82,19 @@ vmaImage copyImage2Buffer(vmaImage vkImage, VkCommSet commandBufferSets, vmaBuff
 
   printf("Allocating img:");
 	//copy the buffer into the image
-  commandBufferSets.beginSingleTimeCommands();
+  
   {
     vkCmdCopyBufferToImage(commandBufferSets.commandBuffer, stagingBuffer.buff, vkImage.img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
     // transitionImageLayout(commandBufferSets.commandBuffer, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, vkImage.img);
     // vkImage.current=VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
   }
-  commandBufferSets.endSingleTimeCommands(queue);
+  
         // printf("%s %ld \n", "Copied Buff-ToImg in :", clock() - a/CLOCKS_PER_SEC);
 
     return vkImage;
 }
 
-auto ImgLoader::loadImg(VkQueue queue) ->vmaImage
+void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaBuffer stagingBuffer)
 {
     auto a = clock();
     int x, y, cnls;
@@ -111,7 +111,7 @@ auto ImgLoader::loadImg(VkQueue queue) ->vmaImage
 
     constexpr VkOffset2D Offs{width, height};
 
-    auto stagingBuffer = allocBuff(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT|VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true);
+    // auto stagingBuffer = allocBuff(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT|VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true);
     //memSys::addMappedSection(VmaAllocation, imageSize);
     vmaMapMemory(this->a, stagingBuffer.alloc, (&data));
     {
@@ -127,9 +127,9 @@ auto ImgLoader::loadImg(VkQueue queue) ->vmaImage
 	// tstA::freeImg(limg);
 
    
-    auto vkImage= allocImg(defres, imageSize, VK_IMAGE_USAGE_TRANSFER_SRC_BIT|VK_IMAGE_USAGE_TRANSFER_DST_BIT);
-    VkCommSet commandBufferSets{*this, 2}; 
-    return copyImage2Buffer(vkImage, commandBufferSets, stagingBuffer, queue);
+    // auto vkImage= allocImg(defres, imageSize, VK_IMAGE_USAGE_TRANSFER_SRC_BIT|VK_IMAGE_USAGE_TRANSFER_DST_BIT);
+   
+    // return copyImage2Buffer(vkImage, commandBufferSets, stagingBuffer, queue);
    
 
 }
@@ -166,12 +166,12 @@ void ImgLoader::transitionImageLayout( VkCommandBuffer commandBuffer, VkFormat f
   {
     case VK_IMAGE_LAYOUT_PREINITIALIZED: barrier.srcAccessMask = ( VK_ACCESS_MEMORY_READ_BIT ); break;
     
-    case VK_IMAGE_LAYOUT_UNDEFINED: barrier.srcAccessMask = ( VK_ACCESS_TRANSFER_READ_BIT ); break;
+    case VK_IMAGE_LAYOUT_UNDEFINED: barrier.srcAccessMask = ( VK_ACCESS_SHADER_READ_BIT ); break;
 
-    case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL: barrier.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT; break;
-    case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL: barrier.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT; break;
+    case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL: barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT; break;
+    case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL: barrier.srcAccessMask = VK_ACCESS_NONE; break;
 
-    case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR: barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT; break;
+    case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR: barrier.srcAccessMask = VK_ACCESS_NONE; break;
     case VK_IMAGE_LAYOUT_GENERAL: barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT; break;
 
     default:  printf( "Unsupported layout transition" ), exit(1);
@@ -206,9 +206,9 @@ void ImgLoader::transitionImageLayout( VkCommandBuffer commandBuffer, VkFormat f
     case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
     {
         barrier.subresourceRange.aspectMask = ( VK_IMAGE_ASPECT_COLOR_BIT );
-        barrier.dstAccessMask = ( VK_ACCESS_MEMORY_READ_BIT );
-        sourceStage           = VK_PIPELINE_STAGE_TRANSFER_BIT;
-        destinationStage      = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        barrier.dstAccessMask = ( VK_ACCESS_SHADER_READ_BIT );
+        sourceStage           = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+        destinationStage      = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
         break;
     }
     case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:
