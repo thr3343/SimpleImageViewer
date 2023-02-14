@@ -25,9 +25,9 @@ struct SwapChain : Tmp
 {
    
     SwapchainCapabilities extent;
-    VkRenderPass renderPass;
+    // VkRenderPass renderPass;
     // VkSurfaceFormatKHR format;
-    VkFramebuffer frameBuffer;
+    // VkFramebuffer frameBuffer;
     VkSwapchainKHR swapchain;
     VkPresentModeKHR presentMode;
     std::array<VkImage, Frames> image;
@@ -38,7 +38,7 @@ struct SwapChain : Tmp
            extent(handleSwapChainCapabilities()),
         //    renderPass(createRenderPass()),
            // format(setupImageFormats(physDevice, VkSurfaceKHR)),
-           frameBuffer(createFramebuffers()), 
+        //    frameBuffer(createFramebuffers()), 
            swapchain(createSwapChain()),
            image(getSwapChainImages(Frames)),
            imageViews(createImageViews(image)), SwapChain::Tmp(swap){}; // TODO(Vcmp): use Move Construction to avoid duplciating the handles: (Minor Mem Leak)
@@ -63,8 +63,8 @@ struct SwapChain : Tmp
             vkDestroyImageView(tmpDevice_, imageViews[a], nullptr);
             // vkDestroyImage(tmpDevice_, image[a], nullptr);
        }
-       vkDestroyRenderPass(tmpDevice_, renderPass, nullptr);
-       vkDestroyFramebuffer(tmpDevice_, frameBuffer, nullptr);
+    //    vkDestroyRenderPass(tmpDevice_, renderPass, nullptr);
+    //    vkDestroyFramebuffer(tmpDevice_, frameBuffer, nullptr);
        vkDestroySwapchainKHR(tmpDevice_, swapchain, nullptr);
 
        
