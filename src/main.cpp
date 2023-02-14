@@ -57,14 +57,29 @@ VkBufferImageCopy bufferImageCopy
 
     vkCmdCopyImageToBuffer(computePipeline.commSet.commandBuffer, imgLoader.vmaImg.img, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, computePipeline.compSSBO.buff, 1, &bufferImageCopy);
 
-    // vkCmdDispatch(computePipeline.commSet.commandBuffer, width*height*128, 0, 0);
-    // vkQueueWaitIdle(vkbase.PresentQueue.queue);
+    vkCmdDispatch(computePipeline.commSet.commandBuffer, width*height*128, 0, 0);
+    vkQueueWaitIdle(vkbase.PresentQueue.queue);
     imgLoader.transitionImageLayout(computePipeline.commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, TImg2.img);
-   vkCmdCopyBufferToImage(computePipeline.commSet.commandBuffer, computePipeline.compSSBO.buff, TImg2.img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
+  //  vkCmdCopyBufferToImage(computePipeline.commSet.commandBuffer, computePipeline.compSSBO.buff, TImg2.img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
     // imgLoader.transitionImageLayout(computePipeline.commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, imgLoader.vmaImg.img);
+  VkImageCopy copyRegion
+    {
+      .srcSubresource=subresource,
+      .srcOffset=VkOffset3D{0, 0, 0},
+      .dstSubresource=subresource,
+	    .dstOffset=VkOffset3D{0, 0, 0},
+      .extent=defres
 
+    };
+      for(const VkImage &img : swapChain.image) {
+        imgLoader.transitionImageLayout(computePipeline.commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, img);
+    vkCmdCopyBufferToImage(computePipeline.commSet.commandBuffer, computePipeline.compSSBO.buff, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
+        imgLoader.transitionImageLayout(computePipeline.commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, img);
+        // imgLoader.transitionImageLayout(computePipeline.commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, TImg2.img);
+
+  }
     computePipeline.commSet.endSingleTimeCommands(vkbase.PresentQueue.queue, true);
-    // while(IsWindow(vkbase.window))
+    while(IsWindow(vkbase.window))
     {
         static LPMSG msg;
         static DWORD prevTime;
@@ -76,9 +91,8 @@ VkBufferImageCopy bufferImageCopy
        
         PeekMessageA(msg, vkbase.window, WM_KEYFIRST, WM_MOVING, PM_REMOVE);
        
-        chkTst(vkWaitForFences(vkbase.device, 1, &R2.fence[renderer2::currentFrame], false, -1));
-        imgLoader.copyImage2Image(TImg2, imgLoader.commandBuffers[renderer2::currentFrame], swapChain.image[renderer2::imgIndx]);
-        R2.drawFrame({imgLoader.commandBuffers[renderer2::currentFrame]});
+        // chkTst(vkWaitForFences(vkbase.device, 1, &R2.fence[renderer2::currentFrame], false, -1));
+        R2.drawFrame();
         
 
         if(prevTime+CLOCKS_PER_SEC<clock())
@@ -98,32 +112,33 @@ VkBufferImageCopy bufferImageCopy
     vkbase.~Vkbase();
 }
 
-void renderer2::drawFrame(std::initializer_list<VkCommandBuffer> commandBuffer) const noexcept
+void renderer2::drawFrame() const noexcept
 {
 
-  chkTst(vkWaitForFences(vkbase.device, 1, &R2.fence2[renderer2::imgIndx], false, -1));
-  vkResetFences(vkbase.device, 1, &R2.fence2[renderer2::imgIndx]);
-  chkTst(vkAcquireNextImageKHR( vkbase.device, swapChain.swapchain, -1, nullptr, fence2[imgIndx], reinterpret_cast<uint32_t*>(&imgIndx) ));
+  chkTst(vkWaitForFences(vkbase.device, 1, &R2.fence2[currentFrame], false, -1));
+  vkResetFences(vkbase.device, 1, &R2.fence2[currentFrame]);
+  //TODO(thr3343): Replace fence Setup with Semaphore
+  chkTst(vkAcquireNextImageKHR( vkbase.device, swapChain.swapchain, -1, nullptr, fence2[renderer2::currentFrame], reinterpret_cast<uint32_t*>(&imgIndx) ));
   
   constexpr VkPipelineStageFlags t=VK_PIPELINE_STAGE_TRANSFER_BIT;
-      const VkSubmitInfo info
-      {
-              .sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-                .waitSemaphoreCount=1,
-                .pWaitSemaphores=&PresentSemaphore[currentFrame],
-              .pWaitDstStageMask  = &t,
-              .commandBufferCount = 1,
-              .pCommandBuffers= commandBuffer.begin(),
-              .signalSemaphoreCount=1,
-              .pSignalSemaphores=&PresentSemaphore[currentFrame]
-      };
+      // const VkSubmitInfo info
+      // {
+      //         .sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+      //           .waitSemaphoreCount=1,
+      //           .pWaitSemaphores=&PresentSemaphore[currentFrame],
+      //         .pWaitDstStageMask  = &t,
+      //         .commandBufferCount = 1,
+      //         .pCommandBuffers= commandBuffer.begin(),
+      //         .signalSemaphoreCount=1,
+      //         .pSignalSemaphores=&PresentSemaphore[currentFrame]
+      // };
 
- vkResetFences(vkbase.device, 1, &R2.fence[renderer2::imgIndx]);
-    chkTst(vkQueueSubmit( vkbase.PresentQueue.queue, 1, &info, fence[imgIndx]));
+//  vkResetFences(vkbase.device, 1, &R2.fence[renderer2::imgIndx]);
+    // chkTst(vkQueueSubmit( vkbase.PresentQueue.queue, 1, &info, fence[imgIndx]));
  
   
     const VkPresentInfoKHR VkPresentInfoKHR1{ .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-                                                                    .pWaitSemaphores=&PresentSemaphore[currentFrame],
+                                                                    // .pWaitSemaphores=&PresentSemaphore[currentFrame],
                                                                     .swapchainCount = 1,
                                                                     .pSwapchains    = &swapChain.swapchain,
                                                                     .pImageIndices  = reinterpret_cast<uint32_t*>(&imgIndx),

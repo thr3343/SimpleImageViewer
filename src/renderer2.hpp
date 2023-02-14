@@ -13,7 +13,7 @@ struct [[clang::trivial_abi]] renderer2 : Tmp
 {
 
 
-  [[gnu::const, gnu::hot, gnu::always_inline]] inline void drawFrame(std::initializer_list<VkCommandBuffer> commandBuffer) const noexcept;
+  [[gnu::hot, gnu::always_inline]] inline void drawFrame() const noexcept;
 
 
    renderer2(Tmp tmp): Tmp{tmp}{};

@@ -25,7 +25,7 @@ constexpr uint32_t a = 2;
     .usage=VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_STORAGE_BIT,
     .queueFamilyIndexCount=1,
     .pQueueFamilyIndices=&a,
-    .initialLayout=VK_IMAGE_LAYOUT_UNDEFINED
+    .initialLayout=VK_IMAGE_LAYOUT_PREINITIALIZED
   };
   
   vkCreateImage(tmpDevice_, &VkImageCreateInfo, nullptr, image.data());

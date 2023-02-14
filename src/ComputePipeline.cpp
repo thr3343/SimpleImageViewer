@@ -83,7 +83,7 @@
         
 }
 
-[[gnu::pure]] void ComputePipeline::updateDescriptorSetArray(uint32_t size) const noexcept
+void ComputePipeline::updateDescriptorSetArray(uint32_t size) const noexcept
 {
      VkDescriptorBufferInfo bufferInfos
      {
@@ -109,7 +109,7 @@
 
         vkUpdateDescriptorSets(tmpDevice_, 1, &ssboDescriptorWrite, 0, nullptr);
 }
-[[gnu::pure]] void ComputePipeline::resizeThis(uint32_t size) noexcept
+void ComputePipeline::resizeThis(uint32_t size) noexcept
 {       
            vmaUnmapMemory(a, compSSBO.alloc);
             vmaDestroyBuffer(a, compSSBO.buff, compSSBO.alloc);

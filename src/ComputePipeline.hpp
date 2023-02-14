@@ -25,7 +25,7 @@ struct ComputePipeline : MemSys2
     [[nodiscard]] auto setupLayout() const -> VkPipelineLayout;
     [[nodiscard]] auto setupDescriptorPool() const -> VkDescriptorPool;
     [[nodiscard]] auto allocDescriptorSet() const -> VkDescriptorSet;
-    [[gnu::pure]] void updateDescriptorSetArray(uint32_t=width*height*4) const noexcept;
-    [[gnu::pure]] void resizeThis(uint32_t=width*height*4) noexcept;
+    void updateDescriptorSetArray(uint32_t=width*height*4) const noexcept;
+    void resizeThis(uint32_t=width*height*4) noexcept;
     [[gnu::pure]] void reLoad();
 };
