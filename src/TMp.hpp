@@ -11,7 +11,7 @@
 using callArg = int (VKAPI_PTR*)(VkDevice device, const void* pCreateInfo, const void* pAllocator, void* pCommandPool);
 using PFN_vkVoidFunction = void (VKAPI_PTR*)(void);
 
-struct Tmp
+struct [[gnu::aligned(32)]] Tmp
 {
   VkInstance tmpInst_;
   VkDevice tmpDevice_;

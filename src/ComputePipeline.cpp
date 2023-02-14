@@ -120,7 +120,7 @@ void ComputePipeline::resizeThis(uint32_t size) noexcept
      
 }
 
-void ComputePipeline::BGR2RGBSwizzle(ImgLoader &imgLoader, VkQueue queue, std::array<VkImage, Frames> image) const noexcept
+void ComputePipeline::BGR2RGBSwizzle(ImgLoader const &imgLoader, VkQueue queue, std::array<VkImage, Frames> image) const noexcept
 {
     commSet.beginSingleTimeCommands();
     imgLoader.loadImg(commSet, queue, compSSBO);

@@ -94,7 +94,7 @@ vmaImage copyImage2Buffer(vmaImage vkImage, VkCommSet commandBufferSets, vmaBuff
     return vkImage;
 }
 
-void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaBuffer stagingBuffer)
+void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaBuffer stagingBuffer) const
 {
     auto a = clock();
     int x, y, cnls;
@@ -113,10 +113,10 @@ void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaBuffer st
 
     // auto stagingBuffer = allocBuff(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT|VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true);
     //memSys::addMappedSection(VmaAllocation, imageSize);
-    vmaMapMemory(this->a, stagingBuffer.alloc, (&data));
+    vmaMapMemory(this->a, stagingBuffer.alloc, (&stagingBuffer.aData));
     {
 
-	    memcpy(data, limg, imageSize);
+	    memcpy(stagingBuffer.aData, limg, imageSize);
 
     }
     vmaUnmapMemory(this->a, stagingBuffer.alloc);

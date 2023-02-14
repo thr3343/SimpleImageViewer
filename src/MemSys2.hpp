@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <vulkan/vulkan_core.h>
-
+ static const constinit void *aData;
 
 constexpr VkImageSubresourceLayers subresource = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
 	    .mipLevel = 0,
@@ -12,15 +12,20 @@ constexpr VkImageSubresourceLayers subresource = {.aspectMask = VK_IMAGE_ASPECT_
 	    .layerCount = 1,
         };
 constexpr VkDeviceSize defSize=static_cast<const VkDeviceSize>(width*height)*4Ul;
-struct vmaBuffer
+struct  [[gnu::aligned(32)]] vmaBuffer
 {
+
+ constexpr vmaBuffer(VkBuffer buff, VmaAllocation alloc, VkDeviceSize size,
+            VkBufferUsageFlags usageFlags)
+     noexcept : buff(buff), alloc(alloc), size(size), usageFlags(usageFlags) {}
   VkBuffer buff;
-  VmaAllocation alloc;
   VkDeviceSize size;
+  VmaAllocation alloc;
   VkBufferUsageFlags usageFlags;
+  void* aData;
 };
 
-struct vmaImage
+struct [[gnu::aligned(32)]] vmaImage
 {
     VkImage img; 
     VkExtent2D extent;

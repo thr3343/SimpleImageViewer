@@ -31,5 +31,5 @@ struct ComputePipeline : MemSys2
     void resizeThis(uint32_t=defSize) noexcept;
     [[gnu::pure]] void reLoad();
     
-    [[gnu::pure]] void BGR2RGBSwizzle(ImgLoader &imgLoader, VkQueue queue, std::array<VkImage, Frames> image) const noexcept;
+    [[gnu::pure]] void BGR2RGBSwizzle(ImgLoader const&imgLoader, VkQueue queue, std::array<VkImage, Frames> image) const noexcept;
 };
