@@ -165,8 +165,8 @@ void ComputePipeline::BGR2RGBSwizzle(ImgLoader const &imgLoader, VkQueue queue, 
     constexpr VkShaderModuleCreateInfo shaderModuleCreateInfo 
     {
         .sType=VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-        .codeSize=ax.size()*sizeof(uint32_t),
-        .pCode=ax.data()
+        .codeSize=Swizzle.size()*sizeof(uint32_t),
+        .pCode=Swizzle.begin()
 
     };
 
