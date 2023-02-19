@@ -6,7 +6,7 @@
 #include <vulkan/vulkan_core.h>
  static const constinit void *aData;
 
-constexpr VkImageSubresourceLayers subresource = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+constexpr VkImageSubresourceLayers subresource alignas(16) = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
 	    .mipLevel = 0,
 	    .baseArrayLayer = 0,
 	    .layerCount = 1,

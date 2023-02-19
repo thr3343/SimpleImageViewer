@@ -5,13 +5,19 @@
 #include "Swizzle.inl"
 
 
+[[nodiscard, gnu::pure]] auto ComputePipeline::determineDescriptorVarient(vmaImage vmaImage) const -> VkDescriptorType
+{
+
+    return vmaImage.usageFlags&VK_IMAGE_USAGE_STORAGE_BIT?VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+}
+
 [[nodiscard]] auto ComputePipeline::setupDescriptorSetLayout() const -> VkDescriptorSetLayout
 {
 
-    constexpr VkDescriptorSetLayoutBinding bindings
+    VkDescriptorSetLayoutBinding bindings
     {
         .binding=0,
-        .descriptorType=VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+        .descriptorType=descriptorVarient,
         .descriptorCount=1,
         .stageFlags=VK_SHADER_STAGE_COMPUTE_BIT,
         .pImmutableSamplers=nullptr,
@@ -45,9 +51,9 @@
 [[nodiscard]] auto ComputePipeline::setupDescriptorPool() const -> VkDescriptorPool
 {
     
-                constexpr VkDescriptorPoolSize poolSizes
+                VkDescriptorPoolSize poolSizes
                 {
-                    .type=VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+                    .type=descriptorVarient,
                     .descriptorCount=1,
                 };
 
@@ -103,7 +109,7 @@ void ComputePipeline::updateDescriptorSetArray(uint32_t size) const noexcept
             .dstBinding=0,
             .dstArrayElement=0,
             .descriptorCount=1,
-            .descriptorType=VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+            .descriptorType=descriptorVarient,
             .pImageInfo=&imgInfos,
         };
 
