@@ -4,7 +4,7 @@
 layout (local_size_x = 32) in;
 
 
-layout(binding = 0, rgba8) uniform restrict image2D Img;
+layout(binding = 0, rgba8ui) uniform restrict uimage2D Img;
 
 
 const uvec4 A = uvec4(255<<24);

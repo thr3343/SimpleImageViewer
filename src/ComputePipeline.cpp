@@ -8,7 +8,7 @@
 [[nodiscard]] auto ComputePipeline::setupDescriptorSetLayout() const -> VkDescriptorSetLayout
 {
 
-    VkDescriptorSetLayoutBinding bindings
+    constexpr VkDescriptorSetLayoutBinding bindings
     {
         .binding=0,
         .descriptorType=VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
@@ -126,9 +126,11 @@ void ComputePipeline::BGR2RGBSwizzle(ImgLoader const &imgLoader, VkQueue queue, 
     commSet.beginSingleTimeCommands();
     imgLoader.loadImg(commSet, queue, compSSBO);
 
+
     imgLoader.transitionImageLayout(commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, compSSBO.img);
     compSSBO.current=VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
  
+    updateDescriptorSetArray();
 
     vkCmdBindPipeline(commSet.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, compPipeline);
     vkCmdBindDescriptorSets(commSet.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, compPipelineLayout, 0, 1, &compDescriptorSet, 0, nullptr);

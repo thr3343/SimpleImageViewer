@@ -1,7 +1,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <cstdio>
+
 #include <ctime>
 #include <vulkan/vulkan_core.h>
 #include <windef.h>
@@ -12,6 +12,7 @@
 #include "ImgLoader.hpp"
 #include "renderer2.hpp"
 #include "ComputePipeline.hpp"
+#include <fmt/core.h>
 
 
 
@@ -59,14 +60,14 @@ auto main() -> int
         {
             tmSecs++;
             prevTime=x;
-            printf("%i \n", i);
+            fmt::println("{}",i);
             i=0;
         }
 
         i++;
     }
 
-    printf("No Window! \n");
+    fmt::print("No Window! \n");
 
     swapChain.~SwapChain();
     vkbase.~Vkbase();

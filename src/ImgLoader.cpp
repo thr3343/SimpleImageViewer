@@ -31,7 +31,7 @@ auto ImgLoader::doGenCommnd(uint32_t count, VkCommandPool commandPool) const -> 
                                                   .commandPool        =  commandPool ,
                                                   .level              =  VK_COMMAND_BUFFER_LEVEL_PRIMARY ,
                                                   .commandBufferCount = count};
-  printf("%i %s\n",allocateInfo.commandBufferCount, "Command Buffers");
+  fmt::print("{} {}\n", allocateInfo.commandBufferCount, "Command Buffers");
   
   chkTst(vkAllocateCommandBuffers(tmpDevice_, &allocateInfo, PreTestBuffer.data() ));
   return PreTestBuffer;
@@ -39,7 +39,7 @@ auto ImgLoader::doGenCommnd(uint32_t count, VkCommandPool commandPool) const -> 
 
 void ImgLoader::copyImage2Image(vmaImage vkImage, VkCommandBuffer commandBufferSets, VkImage stagingBuffer) const
 {
-       VkImageCopy copyRegion
+    constexpr   VkImageCopy copyRegion
     {
       .srcSubresource=subresource,
       .srcOffset=VkOffset3D{0, 0, 0},
@@ -49,22 +49,22 @@ void ImgLoader::copyImage2Image(vmaImage vkImage, VkCommandBuffer commandBufferS
 
     };
     
-  // printf("Allocating img:");
+  // fmt::print("Allocating img:");
 	//copy the buffer into the image
     constexpr VkCommandBufferBeginInfo beginInfo1 = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
                                                     .flags = ( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT) };
   vkBeginCommandBuffer(commandBufferSets, &beginInfo1);
   {
-    transitionImageLayout(commandBufferSets, VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, stagingBuffer);
+    transitionImageLayout(commandBufferSets, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, stagingBuffer);
     vkCmdCopyImage(commandBufferSets, vkImage.img, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, stagingBuffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
-    transitionImageLayout(commandBufferSets, VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, stagingBuffer);
+    transitionImageLayout(commandBufferSets, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, stagingBuffer);
     // vkImage.current=VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
   }
   
   vkEndCommandBuffer( commandBufferSets );
 
 
-        // printf("%s %ld \n", "Copied Buff-ToImg in :", clock() - a/CLOCKS_PER_SEC);
+        // fmt::print("%s %ld \n", "Copied Buff-ToImg in :", clock() - a/CLOCKS_PER_SEC);
 
     
 }
@@ -80,7 +80,7 @@ vmaImage copyBuffer2Image(vmaImage &vkImage, VkCommSet commandBufferSets, vmaBuf
 	    .imageExtent = defres,
     };
  
-  printf("Allocating img:");
+  fmt::print("Allocating img:");
 	//copy the buffer into the image
   
   {
@@ -89,7 +89,7 @@ vmaImage copyBuffer2Image(vmaImage &vkImage, VkCommSet commandBufferSets, vmaBuf
     // vkImage.current=VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
   }
   
-        // printf("%s %ld \n", "Copied Buff-ToImg in :", clock() - a/CLOCKS_PER_SEC);
+        // fmt::print("%s %ld \n", "Copied Buff-ToImg in :", clock() - a/CLOCKS_PER_SEC);
 
     return vkImage;
 }
@@ -99,12 +99,12 @@ void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaImage vma
     auto a = clock();
     int x, y, cnls;
         FILE *f = fopen64(R"(tst.png)", "rb");
-        printf("%s %ld \n", "Opened Image in :", clock() - a/CLOCKS_PER_SEC);
+        fmt::print("Opened Image in : {}\n", clock() - a/CLOCKS_PER_SEC);
 
         
     auto limg = tstA::loadImg(*f, x, y, cnls);
     // std::cout << sizeof(limg) <<"--"<< x <<"--"<< y <<"--"<< cnls << "\n";
-    printf("%s %ld \n", "Loaded Image in :", clock() - a/CLOCKS_PER_SEC);
+    fmt::print("Loaded Image in : {}\n", clock() - a/CLOCKS_PER_SEC);
  
      uint32_t imageSize = width * height*4UL;
 
@@ -122,7 +122,7 @@ void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaImage vma
 
     }
     vmaUnmapMemory(this->a, stagingBuffer.alloc);
-        printf("%s %ld \n", "Copied Image in :", clock() - a/CLOCKS_PER_SEC);
+        fmt::print("Copied Image in : {}\n", clock() - a/CLOCKS_PER_SEC);
 
 	  // memSys::mapMem(limg, imageSize);
 
@@ -177,7 +177,7 @@ void ImgLoader::transitionImageLayout( VkCommandBuffer commandBuffer, VkFormat f
     case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR: barrier.srcAccessMask = VK_ACCESS_NONE; break;
     case VK_IMAGE_LAYOUT_GENERAL: barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT; break;
 
-    default:  printf( "Unsupported layout transition" ), exit(1);
+    default:  fmt::print( "Unsupported layout transition" ), exit(1);
   }
 
   switch ( newLayout )
@@ -229,7 +229,7 @@ void ImgLoader::transitionImageLayout( VkCommandBuffer commandBuffer, VkFormat f
         destinationStage      = VK_PIPELINE_STAGE_TRANSFER_BIT;
         break;
     }
-    default:  printf( "Unsupported layout transition" ), exit(1);
+    default:  fmt::print( "Unsupported layout transition" ), exit(1);
   }
 
   vkCmdPipelineBarrier( 

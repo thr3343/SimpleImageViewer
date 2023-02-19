@@ -2,12 +2,12 @@
 #include <array>
 #include <initializer_list>
 #include <cstdint>
-#include <cstdio>
+#include <fmt/core.h>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_win32.h>
 
-constexpr bool ENABLE_VALIDATION_LAYERS = false;
+constexpr bool ENABLE_VALIDATION_LAYERS = true;
 
 constexpr auto *validationLayers = "VK_LAYER_KHRONOS_validation";
 constexpr auto extensions= { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME};
@@ -26,7 +26,7 @@ auto Vkbase::createInstance() -> VkInstance
 {
         static constexpr auto valdFeatures       = { VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT,
                                                                    VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT,
-                                                                   VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT };
+                                                                   VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT};
 
         constexpr VkValidationFeaturesEXT  extValidationFeatures
         {
@@ -75,7 +75,7 @@ auto Vkbase::createSurface(HINSTANCE inst, HWND win)  -> VkSurfaceKHR
 {
       
     VkSurfaceKHR surface;
-    printf( "Creating Surface\n");;
+    fmt::print( "Creating Surface\n");;
   VkWin32SurfaceCreateInfoKHR createSurfaceInfo = {
         .sType                       = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
         .hwnd                        = win,
@@ -89,7 +89,7 @@ auto Vkbase::createSurface(HINSTANCE inst, HWND win)  -> VkSurfaceKHR
 
 void Vkbase::clean()
 {
-        printf("Clean!\n");
+        fmt::print("Clean!\n");
         vkDestroySurfaceKHR(instance, surface, nullptr);
         vkDestroyInstance(instance, nullptr);
 }
@@ -105,14 +105,14 @@ auto getPhyDevProps(VkPhysicalDevice physDevice) -> VkPhysicalDeviceProperties
 
 auto Vkbase::createPhysDevice() -> VkPhysicalDevice
 {
-  printf( "Picking Physical Device\n");
+  fmt::print( "Picking Physical Device\n");
    uint32_t deviceCount;
   vkEnumeratePhysicalDevices( instance, &deviceCount, nullptr ) ;
 
  
    std::vector<VkPhysicalDevice> ppPhysicalDevicesdeviceCount(deviceCount);
 
-  printf("Enumerate Physical Device\n");
+  fmt::print("Enumerate Physical Device\n");
   vkEnumeratePhysicalDevices( instance, &deviceCount, ppPhysicalDevicesdeviceCount.data() );
 
 for(VkPhysicalDevice physDevs : ppPhysicalDevicesdeviceCount)
@@ -130,7 +130,7 @@ for(VkPhysicalDevice physDevs : ppPhysicalDevicesdeviceCount)
 // }
 auto Vkbase::createDevice() -> VkDevice
 {
- // printf( "Creating Device\n");
+ // fmt::print( "Creating Device\n");
 
   //enumerateQueues();
 
