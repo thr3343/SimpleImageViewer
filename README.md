@@ -1,6 +1,6 @@
 # SimpleImageViewer
 
-Experimenal utility tesing use of the Vulkan API in tandem with Rendering techniques and GPU capabilities instead of more conventional CPU/Scalar-based approaches to render and handle image and bitmap formats.
+Experiment to test use of alternate Rendering techniques and GPU capabilities to render and handle image and bitmap formats.
 
 This is heavily based on the [VkMod2 Repo](https://github.com/thr3343/VkMod2), so may reuse code from there in some places
 
