@@ -13,7 +13,7 @@ struct ImgLoader:MemSys2
     
     // vmaImage vmaImg;
 
-    void loadImg(VkCommSet, VkQueue, vmaBuffer) const;
+    void loadImg(VkCommSet, VkQueue, vmaImage) const;
     void transitionImageLayout( VkCommandBuffer commandBuffer, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, VkImage const& image) const;
     // void vkRecImg(VkImage const& img, int a, VkQueue queue) const;
     [[nodiscard]] auto doGenCommnd(uint32_t count, VkCommandPool commandPool) const -> std::array<VkCommandBuffer, Frames>;

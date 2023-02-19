@@ -46,7 +46,7 @@ auto MemSys2::allocBuff(VkDeviceSize size, VkBufferUsageFlags usageFlags, VkMemo
     return {b, alloc, size, usageFlags};
 }
 
-auto MemSys2::allocImg(VkExtent3D extent, uint32_t size, VkImageUsageFlags usage) const -> vmaImage
+auto MemSys2::allocImg(VkExtent3D extent, uint32_t size, VkImageUsageFlags usage, VkImageView view) const -> vmaImage
 {
 
     VkImageCreateInfo bufferCreateInfo
@@ -69,14 +69,14 @@ auto MemSys2::allocImg(VkExtent3D extent, uint32_t size, VkImageUsageFlags usage
 
    	constexpr VmaAllocationCreateInfo dimg_allocinfo = 
     {
-      .flags=VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT,
-      .usage=VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE,
-      .memoryTypeBits=0,
+      // .flags=VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT|VMA_ALLOCATION_CREATE_MAPPED_BIT|VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
+      .usage=VMA_MEMORY_USAGE_AUTO,
+      // .memoryTypeBits=0,
       .pool=nullptr
     };
 
     VkImage img;
     VmaAllocation alloc;
     vmaCreateImage(a, &bufferCreateInfo, &dimg_allocinfo, &img, &alloc, nullptr);
-    return {img, {extent.width, extent.height}, size, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL, VK_FORMAT_B8G8R8A8_UNORM};
+    return {img, {extent.width, extent.height}, size, usage, VK_IMAGE_LAYOUT_UNDEFINED, alloc, VK_FORMAT_B8G8R8A8_UNORM,view};
 }

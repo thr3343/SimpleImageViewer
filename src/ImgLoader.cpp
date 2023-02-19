@@ -70,7 +70,7 @@ void ImgLoader::copyImage2Image(vmaImage vkImage, VkCommandBuffer commandBufferS
 }
 
 
-vmaImage copyImage2Buffer(vmaImage vkImage, VkCommSet commandBufferSets, vmaBuffer stagingBuffer, VkQueue queue)
+vmaImage copyBuffer2Image(vmaImage &vkImage, VkCommSet commandBufferSets, vmaBuffer stagingBuffer, VkQueue queue)
 {
       constexpr VkBufferImageCopy copyRegion
     {
@@ -79,7 +79,7 @@ vmaImage copyImage2Buffer(vmaImage vkImage, VkCommSet commandBufferSets, vmaBuff
 	    .imageSubresource=subresource,
 	    .imageExtent = defres,
     };
-
+ 
   printf("Allocating img:");
 	//copy the buffer into the image
   
@@ -94,7 +94,7 @@ vmaImage copyImage2Buffer(vmaImage vkImage, VkCommSet commandBufferSets, vmaBuff
     return vkImage;
 }
 
-void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaBuffer stagingBuffer) const
+void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaImage vmaImage) const
 {
     auto a = clock();
     int x, y, cnls;
@@ -111,7 +111,9 @@ void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaBuffer st
 
     constexpr VkOffset2D Offs{width, height};
 
-    // auto stagingBuffer = allocBuff(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT|VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true);
+
+
+    auto stagingBuffer = allocBuff(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT|VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true);
     //memSys::addMappedSection(VmaAllocation, imageSize);
     vmaMapMemory(this->a, stagingBuffer.alloc, (&stagingBuffer.aData));
     {
@@ -128,8 +130,9 @@ void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaBuffer st
 
    
     // auto vkImage= allocImg(defres, imageSize, VK_IMAGE_USAGE_TRANSFER_SRC_BIT|VK_IMAGE_USAGE_TRANSFER_DST_BIT);
-   
-    // return copyImage2Buffer(vkImage, commandBufferSets, stagingBuffer, queue);
+    transitionImageLayout(commandBufferSets.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, vmaImage.img);
+    vmaImage.current=VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    copyBuffer2Image(vmaImage, commandBufferSets, stagingBuffer, queue);
    
 
 }

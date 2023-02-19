@@ -1,6 +1,7 @@
 #include "ComputePipeline.hpp"
 #include <cstdint>
 #include <vk_mem_alloc.h>
+#include <vulkan/vulkan_core.h>
 #include "Swizzle.inl"
 
 
@@ -10,7 +11,7 @@
     VkDescriptorSetLayoutBinding bindings
     {
         .binding=0,
-        .descriptorType=VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+        .descriptorType=VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
         .descriptorCount=1,
         .stageFlags=VK_SHADER_STAGE_COMPUTE_BIT,
         .pImmutableSamplers=nullptr,
@@ -46,7 +47,7 @@
     
                 constexpr VkDescriptorPoolSize poolSizes
                 {
-                    .type=VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                    .type=VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
                     .descriptorCount=1,
                 };
 
@@ -86,11 +87,11 @@
 
 void ComputePipeline::updateDescriptorSetArray(uint32_t size) const noexcept
 {
-     VkDescriptorBufferInfo bufferInfos
+     VkDescriptorImageInfo imgInfos
      {
-            .buffer=compSSBO.buff,
-            .offset=0,
-            .range=size,
+           .sampler=nullptr,
+           .imageLayout=compSSBO.current,
+           .imageView=compSSBO.view
      };
 
 
@@ -102,8 +103,8 @@ void ComputePipeline::updateDescriptorSetArray(uint32_t size) const noexcept
             .dstBinding=0,
             .dstArrayElement=0,
             .descriptorCount=1,
-            .descriptorType=VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-            .pBufferInfo=&bufferInfos,
+            .descriptorType=VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+            .pImageInfo=&imgInfos,
         };
 
 
@@ -113,37 +114,40 @@ void ComputePipeline::updateDescriptorSetArray(uint32_t size) const noexcept
 void ComputePipeline::resizeThis(uint32_t size) noexcept
 {       
            vmaUnmapMemory(a, compSSBO.alloc);
-            vmaDestroyBuffer(a, compSSBO.buff, compSSBO.alloc);
-            compSSBO = allocBuff(size,compSSBO.usageFlags,VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+            vmaDestroyImage(a, compSSBO.img, compSSBO.alloc);
+            compSSBO = allocImg(defres,defSize,compSSBO.usageFlags, compSSBO.view);
             updateDescriptorSetArray(size);
             vmaMapMemory(a, compSSBO.alloc, &data);
      
 }
 
-void ComputePipeline::BGR2RGBSwizzle(ImgLoader const &imgLoader, VkQueue queue, std::array<VkImage, Frames> image) const noexcept
+void ComputePipeline::BGR2RGBSwizzle(ImgLoader const &imgLoader, VkQueue queue, std::array<VkImage, Frames> image) noexcept
 {
     commSet.beginSingleTimeCommands();
     imgLoader.loadImg(commSet, queue, compSSBO);
+
+    imgLoader.transitionImageLayout(commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, compSSBO.img);
+    compSSBO.current=VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+ 
 
     vkCmdBindPipeline(commSet.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, compPipeline);
     vkCmdBindDescriptorSets(commSet.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, compPipelineLayout, 0, 1, &compDescriptorSet, 0, nullptr);
 
 
     constexpr uint32_t rowPitch = 0;
-    constexpr VkBufferImageCopy bufferImageCopy
+    constexpr VkImageCopy bufferImageCopy
     {
-        .bufferOffset=0,
-        .bufferImageHeight=height,
-        .imageExtent=defres,
-        .bufferRowLength=rowPitch,
-        .imageOffset=0,
-        .imageSubresource=subresource
+        .dstOffset{0},
+        .srcOffset{0},
+        .dstSubresource=subresource,
+        .srcSubresource=subresource,
+        .extent=defres
     };
 
     // vkCmdCopyImageToBuffer(commSet.commandBuffer, TImg2.img, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, compSSBO.buff, 1, &bufferImageCopy);
     
 
-    uint64_t scaleX=(defSize/4/32/128);  
+    uint64_t scaleX=(defSize/4/32/height);  
     vkCmdDispatch(commSet.commandBuffer, scaleX, 1, 1);
 
 
@@ -151,7 +155,7 @@ void ComputePipeline::BGR2RGBSwizzle(ImgLoader const &imgLoader, VkQueue queue, 
     for(const VkImage &img : image) 
     {
     imgLoader.transitionImageLayout(commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, img);
-    vkCmdCopyBufferToImage(commSet.commandBuffer, compSSBO.buff, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
+    vkCmdCopyImage(commSet.commandBuffer, compSSBO.img, compSSBO.current, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
     imgLoader.transitionImageLayout(commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, img);
     }
     commSet.endSingleTimeCommands(queue, true, false);
@@ -165,8 +169,8 @@ void ComputePipeline::BGR2RGBSwizzle(ImgLoader const &imgLoader, VkQueue queue, 
     constexpr VkShaderModuleCreateInfo shaderModuleCreateInfo 
     {
         .sType=VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-        .codeSize=Swizzle.size()*sizeof(uint32_t),
-        .pCode=Swizzle.begin()
+        .codeSize=Swizzle2.size()*sizeof(uint32_t),
+        .pCode=Swizzle2.begin()
 
     };
 

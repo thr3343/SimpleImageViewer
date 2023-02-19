@@ -1,0 +1,143 @@
+; SPIR-V
+; Version: 1.5
+; Generator: Google Shaderc over Glslang; 11
+; Bound: 93
+; Schema: 0
+               OpCapability Shader
+          %2 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main" %gl_GlobalInvocationID %_
+               OpExecutionMode %main LocalSize 32 1 1
+          %1 = OpString ".\\swizzle.csh"
+               OpSource GLSL 460 %1 "#version 460
+#pragma shader_stage(compute)
+
+layout (local_size_x = 32) in;
+
+
+layout(std430, binding = 0) restrict buffer Img
+{
+   uvec4 imageData[];
+};
+
+const uvec4 A = uvec4(255<<24);
+
+void main()
+{
+	const uint xx=gl_GlobalInvocationID.x*32;
+	//const uint yy=gl_GlobalInvocationID.y*WORKGROUP_SIZE;
+	
+	
+	for(uint xOffs=xx;xOffs<xx+32;xOffs++)
+	{
+		
+		{
+			const uvec4 R = (imageData[xOffs]&255)<<16;
+			const uvec4 G = (imageData[xOffs]&65535)>>8<<8;
+			const uvec4 B = (imageData[xOffs]&16777215)>>16;
+			
+			imageData[xOffs]=(R|G|B|A);
+		}
+	}
+	
+	
+	
+	
+}
+"
+               OpSourceExtension "GL_GOOGLE_cpp_style_line_directive"
+               OpSourceExtension "GL_GOOGLE_include_directive"
+               OpName %main "main"
+               OpName %gl_GlobalInvocationID "gl_GlobalInvocationID"
+               OpName %Img "Img"
+               OpMemberName %Img 0 "imageData"
+               OpName %_ ""
+               OpModuleProcessed "entry-point main"
+               OpModuleProcessed "client vulkan100"
+               OpModuleProcessed "target-env spirv1.5"
+               OpModuleProcessed "target-env vulkan1.3"
+               OpModuleProcessed "entry-point main"
+               OpDecorate %gl_GlobalInvocationID BuiltIn GlobalInvocationId
+               OpDecorate %_runtimearr_v4uint ArrayStride 16
+               OpMemberDecorate %Img 0 Restrict
+               OpMemberDecorate %Img 0 Offset 0
+               OpDecorate %Img Block
+               OpDecorate %_ DescriptorSet 0
+               OpDecorate %_ Binding 0
+               OpDecorate %gl_WorkGroupSize BuiltIn WorkgroupSize
+       %void = OpTypeVoid
+          %4 = OpTypeFunction %void
+       %uint = OpTypeInt 32 0
+     %v3uint = OpTypeVector %uint 3
+%_ptr_Input_v3uint = OpTypePointer Input %v3uint
+%gl_GlobalInvocationID = OpVariable %_ptr_Input_v3uint Input
+     %uint_0 = OpConstant %uint 0
+%_ptr_Input_uint = OpTypePointer Input %uint
+    %uint_32 = OpConstant %uint 32
+       %bool = OpTypeBool
+     %v4uint = OpTypeVector %uint 4
+%_runtimearr_v4uint = OpTypeRuntimeArray %v4uint
+        %Img = OpTypeStruct %_runtimearr_v4uint
+%_ptr_StorageBuffer_Img = OpTypePointer StorageBuffer %Img
+          %_ = OpVariable %_ptr_StorageBuffer_Img StorageBuffer
+        %int = OpTypeInt 32 1
+      %int_0 = OpConstant %int 0
+%_ptr_StorageBuffer_v4uint = OpTypePointer StorageBuffer %v4uint
+   %uint_255 = OpConstant %uint 255
+     %int_16 = OpConstant %int 16
+      %v4int = OpTypeVector %int 4
+ %uint_65535 = OpConstant %uint 65535
+      %int_8 = OpConstant %int 8
+%uint_16777215 = OpConstant %uint 16777215
+%uint_4278190080 = OpConstant %uint 4278190080
+         %79 = OpConstantComposite %v4uint %uint_4278190080 %uint_4278190080 %uint_4278190080 %uint_4278190080
+      %int_1 = OpConstant %int 1
+     %uint_1 = OpConstant %uint 1
+%gl_WorkGroupSize = OpConstantComposite %v3uint %uint_32 %uint_1 %uint_1
+         %88 = OpConstantComposite %v4uint %uint_255 %uint_255 %uint_255 %uint_255
+         %89 = OpConstantComposite %v4int %int_16 %int_16 %int_16 %int_16
+         %90 = OpConstantComposite %v4uint %uint_65535 %uint_65535 %uint_65535 %uint_65535
+         %91 = OpConstantComposite %v4int %int_8 %int_8 %int_8 %int_8
+         %92 = OpConstantComposite %v4uint %uint_16777215 %uint_16777215 %uint_16777215 %uint_16777215
+               OpLine %1 14 11
+       %main = OpFunction %void None %4
+          %6 = OpLabel
+               OpLine %1 16 0
+         %15 = OpAccessChain %_ptr_Input_uint %gl_GlobalInvocationID %uint_0
+         %16 = OpLoad %uint %15
+         %18 = OpIMul %uint %16 %uint_32
+               OpLine %1 20 0
+               OpBranch %21
+         %21 = OpLabel
+         %87 = OpPhi %uint %18 %6 %84 %22
+               OpLine %1 20 0
+         %28 = OpIAdd %uint %18 %uint_32
+         %30 = OpULessThan %bool %87 %28
+               OpLoopMerge %23 %22 None
+               OpBranchConditional %30 %22 %23
+         %22 = OpLabel
+               OpLine %1 24 0
+         %42 = OpAccessChain %_ptr_StorageBuffer_v4uint %_ %int_0 %87
+         %43 = OpLoad %v4uint %42
+         %46 = OpBitwiseAnd %v4uint %43 %88
+         %50 = OpShiftLeftLogical %v4uint %46 %89
+               OpLine %1 25 0
+         %54 = OpLoad %v4uint %42
+         %57 = OpBitwiseAnd %v4uint %54 %90
+         %60 = OpShiftRightLogical %v4uint %57 %91
+         %62 = OpShiftLeftLogical %v4uint %60 %91
+               OpLine %1 26 0
+         %66 = OpLoad %v4uint %42
+         %69 = OpBitwiseAnd %v4uint %66 %92
+         %71 = OpShiftRightLogical %v4uint %69 %89
+               OpLine %1 28 0
+         %75 = OpBitwiseOr %v4uint %50 %62
+         %77 = OpBitwiseOr %v4uint %75 %71
+         %80 = OpBitwiseOr %v4uint %77 %79
+               OpStore %42 %80
+               OpLine %1 20 0
+         %84 = OpIAdd %uint %87 %int_1
+               OpBranch %21
+         %23 = OpLabel
+               OpReturn
+               OpFunctionEnd

@@ -22,7 +22,7 @@ constexpr uint32_t a = 2;
     .arrayLayers=1,
     .samples=VK_SAMPLE_COUNT_1_BIT,
     .tiling=VK_IMAGE_TILING_OPTIMAL,
-    .usage=VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+    .usage=VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_STORAGE_BIT,
     .queueFamilyIndexCount=1,
     .pQueueFamilyIndices=&a,
     .initialLayout=VK_IMAGE_LAYOUT_PREINITIALIZED
@@ -35,6 +35,27 @@ constexpr uint32_t a = 2;
 }
 
 
+  auto SwapChain::createImageView(vmaImage image) const -> VkImageView
+  {
+    printf( "Creating Image View\n");
+    // int i = 0;
+    // std::array<VkImageView, Frames> imageViews;
+
+    VkImageSubresourceRange subresourceRange{  VK_IMAGE_ASPECT_COLOR_BIT,0,1,0,1};
+    
+   
+      VkImageViewCreateInfo createInfo
+      {
+          .sType    = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+          .image    = image.img,
+          .viewType = VK_IMAGE_VIEW_TYPE_2D,
+          .format   = extent.format,
+          .subresourceRange=subresourceRange,
+      };
+
+     
+    return doPointerAlloc5<VkImageView>(&createInfo, vkCreateImageView);;
+  }
   auto SwapChain::createImageViews(std::array<VkImage, Frames> images) -> std::array<VkImageView, Frames>
   {
     printf( "Creating Image Views\n");

@@ -1,6 +1,7 @@
 #pragma once
 #include "defs.tpp"
 #include "TMp.hpp"
+#include "MemSys2.hpp"
 #include <array>
 #include <cstdint>
 #include <vulkan/vulkan_core.h>
@@ -41,6 +42,7 @@ struct SwapChain : Tmp
         //    frameBuffer(createFramebuffers()), 
            swapchain(createSwapChain()),
            image(getSwapChainImages(Frames)),
+        //    imageViews(createImageViews(image)),
            SwapChain::Tmp(swap){}; // TODO(Vcmp): use Move Construction to avoid duplciating the handles: (Minor Mem Leak)
 
      auto handleSwapChainCapabilities() -> SwapchainCapabilities;
@@ -54,6 +56,8 @@ struct SwapChain : Tmp
          -> std::array<VkImage, Frames>;
      [[nodiscard]] auto createImageViews(std::array<VkImage, Frames> image)
          -> std::array<VkImageView, Frames>;
+
+     [[nodiscard]] auto createImageView(vmaImage image) const -> VkImageView;
 
      [[gnu::cold, gnu::noreturn]] ~SwapChain() 
      {

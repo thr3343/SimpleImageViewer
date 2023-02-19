@@ -30,9 +30,12 @@ struct [[gnu::aligned(32)]] vmaImage
     VkImage img; 
     VkExtent2D extent;
     uint32_t size;
-    VkImageLayout initial;
+    VkImageUsageFlags usageFlags;
     VkImageLayout current;
+    VmaAllocation alloc;
     VkFormat format;
+    VkImageView view;
+    void* aData;
 };
 constexpr auto defres=VkExtent3D{width, height, 1};
 // /*fake enums:*/  using VkMemoryPropertyFlags = uint32_t;
@@ -45,5 +48,5 @@ struct MemSys2:Tmp
 
     [[nodiscard]] auto setupAlloc(uint32_t) const -> VmaAllocator;
     [[nodiscard]] auto allocBuff(VkDeviceSize, VkBufferUsageFlags, VkMemoryPropertyFlags, bool=false) const -> vmaBuffer;
-    [[nodiscard]] auto allocImg(VkExtent3D =defres, uint32_t=defSize, VkImageUsageFlags=VK_IMAGE_USAGE_TRANSFER_SRC_BIT|VK_IMAGE_USAGE_TRANSFER_DST_BIT) const -> vmaImage;
+    [[nodiscard]] auto allocImg(VkExtent3D =defres, uint32_t=defSize, VkImageUsageFlags=VK_IMAGE_USAGE_TRANSFER_SRC_BIT|VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_STORAGE_BIT, VkImageView=nullptr) const -> vmaImage;
 };

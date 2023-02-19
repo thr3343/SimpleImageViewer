@@ -24,7 +24,7 @@ namespace
     const SwapChain swapChain{tmp};
     // const VkCommSet commSet{tmp, vkbase.TransferQueue.queuefamilyVarient};
     const MemSys2 memSys2{vkbase.vkVer, tmp, vkbase.PresentQueue};
-    const ComputePipeline computePipeline{memSys2};
+     ComputePipeline computePipeline{memSys2, swapChain};
    
     const ImgLoader imgLoader{vkbase.PresentQueue, memSys2};
     const renderer2 R2{tmp};
