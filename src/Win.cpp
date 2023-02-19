@@ -42,7 +42,6 @@ void decodeWMMsg(UINT uMsg)
   case WM_DESTROY: printf("WM_DESTROY\n"); break;
   case WM_MOVE: printf("WM_MOVE\n"); break;
   case WM_SIZE: printf("WM_SIZE\n"); break;
-
   case WM_ACTIVATE: printf("WM_ACTIVATE\n"); break;
 
 
@@ -149,7 +148,6 @@ void decodeWMMsg(UINT uMsg)
   case WM_NCXBUTTONDBLCLK: printf("WM_NCXBUTTONDBLCLK\n"); break;
   case WM_INPUT_DEVICE_CHANGE: printf("WM_INPUT_DEVICE_CHANGE\n"); break;
   case WM_INPUT: printf("WM_INPUT\n"); break;
-  // case WM_KEYFIRST: printf("WM_KEYFIRST\n"); break;
   case WM_KEYDOWN: printf("WM_KEYDOWN\n"); break;
   case WM_KEYUP: printf("WM_KEYUP\n"); break;
   case WM_CHAR: printf("WM_CHAR\n"); break;
@@ -160,15 +158,13 @@ void decodeWMMsg(UINT uMsg)
   case WM_SYSDEADCHAR: printf("WM_SYSDEADCHAR\n"); break;
 
   case WM_UNICHAR: printf("WM_UNICHAR\n"); break;
-  // case WM_KEYLAST: printf("WM_KEYLAST\n"); break;
   case UNICODE_NOCHAR: printf("UNICODE_NOCHAR\n"); break;
 
-  // case WM_KEYLAST: printf("WM_KEYLAST\n"); break;
 
   case WM_IME_STARTCOMPOSITION: printf("WM_IME_STARTCOMPOSITION\n"); break;
   case WM_IME_ENDCOMPOSITION: printf("WM_IME_ENDCOMPOSITION\n"); break;
   case WM_IME_COMPOSITION: printf("WM_IME_COMPOSITION\n"); break;
-  // case WM_IME_KEYLAST: printf("WM_IME_KEYLAST\n"); break;
+
   case WM_INITDIALOG: printf("WM_INITDIALOG\n"); break;
   case WM_COMMAND: printf("WM_COMMAND\n"); break;
   case WM_SYSCOMMAND: printf("WM_SYSCOMMAND\n"); break;
@@ -204,8 +200,6 @@ void decodeWMMsg(UINT uMsg)
   case WM_CTLCOLORSTATIC: printf("WM_CTLCOLORSTATIC\n"); break;
   case MN_GETHMENU: printf("MN_GETHMENU\n"); break;
 
-  // case WM_MOUSEFIRST: printf("WM_MOUSEFIRST\n"); break;
-  // case WM_MOUSEMOVE: printf("WM_MOUSEMOVE\n"); break;
   case WM_LBUTTONDOWN: printf("WM_LBUTTONDOWN\n"); break;
   case WM_LBUTTONUP: printf("WM_LBUTTONUP\n"); break;
   case WM_LBUTTONDBLCLK: printf("WM_LBUTTONDBLCLK\n"); break;
@@ -222,14 +216,6 @@ void decodeWMMsg(UINT uMsg)
 
   case WM_MOUSEHWHEEL: printf("WM_MOUSEHWHEEL\n"); break;
 
-  // case WM_MOUSELAST: printf("WM_MOUSELAST\n"); break;
-
- 
-
-
-  // case XBUTTON1: printf("XBUTTON1\n"); break;
-  // case XBUTTON2: printf("XBUTTON2\n"); break;
-
   case WM_PARENTNOTIFY: printf("WM_PARENTNOTIFY\n"); break;
   case WM_ENTERMENULOOP: printf("WM_ENTERMENULOOP\n"); break;
   case WM_EXITMENULOOP: printf("WM_EXITMENULOOP\n"); break;
@@ -239,26 +225,6 @@ void decodeWMMsg(UINT uMsg)
   case WM_MOVING: printf("WM_MOVING\n"); break;
   case WM_POWERBROADCAST: printf("WM_POWERBROADCAST\n"); break;
 
-  // case PBT_APMQUERYSUSPEND: printf("PBT_APMQUERYSUSPEND\n"); break;
-  // case PBT_APMQUERYSTANDBY: printf("PBT_APMQUERYSTANDBY\n"); break;
-
-  // case PBT_APMQUERYSUSPENDFAILED: printf("PBT_APMQUERYSUSPENDFAILED\n"); break;
-  // case PBT_APMQUERYSTANDBYFAILED: printf("PBT_APMQUERYSTANDBYFAILED\n"); break;
-
-  // case PBT_APMSUSPEND: printf("PBT_APMSUSPEND\n"); break;
-  // case PBT_APMSTANDBY: printf("PBT_APMSTANDBY\n"); break;
-
-  // case PBT_APMRESUMECRITICAL: printf("PBT_APMRESUMECRITICAL\n"); break;
-  // case PBT_APMRESUMESUSPEND: printf("PBT_APMRESUMESUSPEND\n"); break;
-  // case PBT_APMRESUMESTANDBY: printf("PBT_APMRESUMESTANDBY\n"); break;
-
-  // case PBTF_APMRESUMEFROMFAILURE: printf("0x0\n"); break;
-
-  // case PBT_APMBATTERYLOW: printf("PBT_APMBATTERYLOW\n"); break;
-  // case PBT_APMPOWERSTATUSCHANGE: printf("PBT_APMPOWERSTATUSCHANGE\n"); break;
-
-  // case PBT_APMOEMEVENT: printf("PBT_APMOEMEVENT\n"); break;
-  // case PBT_APMRESUMEAUTOMATIC: printf("PBT_APMRESUMEAUTOMATIC\n"); break;
 
   case WM_DEVICECHANGE: printf("WM_DEVICECHANGE\n"); break;
 
@@ -347,7 +313,7 @@ LRESULT CALLBACK constexpr Win::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, 
     
     case WM_MOVE:
       printf("MOVE!\n");
-      printf("%i %i\n", (int)(short) LOWORD(lParam), (int)(short) HIWORD(lParam));
+      printf("%i %i\n", LOWORD(lParam), HIWORD(lParam));
       return true;
     
    
