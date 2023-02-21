@@ -1,6 +1,7 @@
 #include "defs.tpp"
 #include "DirectoryHandler.hpp"
 #include <immintrin.h>
+
 [[clang::vectorcall]] consteval auto si128Toint128(__m128i ext) -> __int128
 {
   return std::bit_cast<__int128>(ext);
@@ -12,10 +13,14 @@ constexpr __m128i _jpg={'.jpg'};
 
 //Less type restrictive form of _mm_load_si128
 //vmovdqa requires min 32 bit alignment (to count as an aligned load, otherwise may regress to unaligned load i.e. vmovdqu))
-template <typename aData> requires(sizeof(aData)<= sizeof(__m128i))
-VEC_CALL(__m128i) auto vmovdqa(const aData P) noexcept -> const __m128i
+
+template<typename aData> requires(sizeof(aData)<=sizeof(__m128i))
+VEC_CALL(__m128i) auto vmovdqa(const aData P) noexcept
 {
-  return *std::bit_cast<const __m128i*>(P);
+  struct __loadu_epi8 {
+    __m128i __v;
+  } __attribute__((__packed__, __may_alias__));
+  return ((const struct __loadu_epi8*)P)->__v;
 }
 
 [[clang::vectorcall]] auto chkExt(__m128i ext) -> bool
@@ -29,10 +34,9 @@ VEC_CALL(__m128i) auto vmovdqa(const aData P) noexcept -> const __m128i
 //use string_view to avoid unnessacery heap alloc
 [[clang::vectorcall]] auto DirectoryHandler::getExtensionfromSubString(std::string_view a) -> __m128i
 {
-    const __m128i aa=vmovdqa(a.cend()-(a.length()<16?:16)); //load end of string with a max 16 byte offset
+    const __m128i aa=vmovdqa(a.cend()-(a.length()<15?a.length():15)); //load end of string with a max 15 byte offset
 
-    const auto extOffset= _mm_movemask_epi8(aa==aDot); //Extension Offset i.e. occurrance of "."
-    __builtin_assume(extOffset<=16);
-
-    return aa<<extOffset; //Remove filename chars via Right byteshift
+    const auto extOffset= _tzcnt_u32(_mm_movemask_epi8(_mm_cmpeq_epi8(aa,aDot))); //Extension Offset i.e. occurrance of "."
+    
+    return vmovdqa(a.cbegin()+extOffset);
 }
