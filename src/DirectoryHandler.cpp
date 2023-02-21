@@ -34,5 +34,5 @@ VEC_CALL(__m128i) auto vmovdqa(const aData P) noexcept -> const __m128i
     const auto extOffset= _mm_movemask_epi8(aa==aDot); //Extension Offset i.e. occurrance of "."
     __builtin_assume(extOffset<=16);
 
-    return aa<<(sizeof(__m128i)-extOffset); //Remove filename chars via Right byteshift
+    return aa<<extOffset; //Remove filename chars via Right byteshift
 }
