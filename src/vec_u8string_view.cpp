@@ -14,7 +14,7 @@ auto vec_u8string_view::stringToVecView(std::string_view string_view) -> __v16qi
   int i;
   for(const auto& x : string_view)
   {
-    if(i++==15) return _a;
+    if(i++==m128Size-1) return _a;
     this->_a[i]=x;
   }
   return _a;

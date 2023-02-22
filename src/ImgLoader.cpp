@@ -2,10 +2,12 @@
 #include <array>
 #include <cstdint>
 #include <ctime>
+#include <smmintrin.h>
 #include <vk_mem_alloc.h>
 #include <vulkan/vulkan_core.h>
 #include "imgLud.hpp"
 #include "VkCommSet.hpp"
+#include "vec_u8string_view.hpp"
 
 
 auto ImgLoader::genCommPool(uint32_t QueuefamilyIndex) const -> VkCommandPool
@@ -98,7 +100,10 @@ void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaImage vma
 {
     auto a = clock();
     int x, y, cnls;
-        FILE *f = fopen64(R"(tst.png)", "rb");
+        vec_u8string_view fn=vec_u8string_view::initHelper({R"(tst.png)"});
+        FILE *f = fopen64(fn.cbegin(), "rb");
+
+        if(_mm_testc_si128(fn.getExtensionfromSubString(), png)) fmt::println("IS PNG Image!");
         fmt::print("Opened Image in : {}\n", clock() - a/CLOCKS_PER_SEC);
 
         

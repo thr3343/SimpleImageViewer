@@ -51,8 +51,8 @@ auto main() -> int
     Maybe Add Basic (Unit) Testing.....
     *Directory recursion/Recursive Directory Walking...
 */
-    vec_u8string_view directoryHandler{{"test.png"}};
-    vec_u8string_view directoryHandler2{{"test.png"}};
+    vec_u8string_view directoryHandler=vec_u8string_view::initHelper({"testtesttesttesttesttesttesttesttesttest.png"});
+    vec_u8string_view directoryHandler2=vec_u8string_view::initHelper({"test.png"});
 
     printf("%s\n",directoryHandler.getExtensionfromSubString());
     printf("%s\n",directoryHandler==directoryHandler2?"OK":"FAIL!");
