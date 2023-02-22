@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 
-#define VEC_CALL(vec) [[nodiscard, gnu::const, gnu::nodebug, gnu::aligned(32), clang::min_vector_width(sizeof(vec))]] [[clang::vectorcall]]  
+#define VEC_CALL(vec) [[nodiscard, gnu::const, gnu::nodebug, gnu::aligned(32), clang::min_vector_width(sizeof(vec))]]  
 
 constexpr uint8_t Frames = 8;
 constexpr uint16_t width = 1920;

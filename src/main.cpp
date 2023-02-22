@@ -12,6 +12,7 @@
 #include "ImgLoader.hpp"
 #include "renderer2.hpp"
 #include "ComputePipeline.hpp"
+#include "vec_u8string_view.hpp"
 #include <fmt/core.h>
 
 /*todo(thr3343): 
@@ -37,10 +38,25 @@ namespace
 uint32_t i;
 uint32_t tmSecs;
 
-
+// constexpr __v16qi aDot={'.','.','.','.','.','.','1','.','.','.','.','.','.','.','.','.'};
+   consteval std::string_view minDef(std::string_view a, int ax=16)
+   {
+        return std::string_view{a.cend()-16, 16};
+   }
 
 auto main() -> int
 {
+
+    /*todo(thr3343): 
+    Maybe Add Basic (Unit) Testing.....
+    *Directory recursion/Recursive Directory Walking...
+*/
+    vec_u8string_view directoryHandler{{"test.png"}};
+    vec_u8string_view directoryHandler2{{"test.png"}};
+
+    printf("%s\n",directoryHandler.getExtensionfromSubString());
+    printf("%s\n",directoryHandler==directoryHandler2?"OK":"FAIL!");
+
     computePipeline.BGR2RGBSwizzle(imgLoader, vkbase.PresentQueue.queue, swapChain.image);
     
     while(IsWindow(vkbase.window))

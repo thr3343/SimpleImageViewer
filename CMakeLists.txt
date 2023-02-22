@@ -31,8 +31,8 @@ target_compile_options(SimpleImageViewer PRIVATE -march=native -mtune=native -sa
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/renderer2.hpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/ComputePipeline.hpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/ComputePipeline.cpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/DirectoryHandler.hpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/DirectoryHandler.cpp"
+			"${CMAKE_CURRENT_SOURCE_DIR}/src/vec_u8string_view.hpp"
+			"${CMAKE_CURRENT_SOURCE_DIR}/src/vec_u8string_view.cpp"
 			
 	)
 	find_package(Vulkan REQUIRED)
