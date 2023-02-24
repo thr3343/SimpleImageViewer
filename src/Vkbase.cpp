@@ -71,14 +71,14 @@ auto Vkbase::createInstance() -> VkInstance
         return vki;
 }
 
-auto Vkbase::createSurface(HINSTANCE inst, HWND win)  -> VkSurfaceKHR
+auto Vkbase::createSurface()  -> VkSurfaceKHR
 {
       
     VkSurfaceKHR surface;
     fmt::print( "Creating Surface\n");;
   VkWin32SurfaceCreateInfoKHR createSurfaceInfo = {
         .sType                       = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
-        .hwnd                        = win,
+        .hwnd                        = hwnd,
         .hinstance                   = inst,
         .pNext                       = VK_NULL_HANDLE
 };

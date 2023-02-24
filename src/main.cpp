@@ -4,8 +4,8 @@
 
 #include <ctime>
 #include <vulkan/vulkan_core.h>
-#include <windef.h>
-#include <winuser.h>
+
+
 #include "VkCtx.hpp"
 #include "VkCommSet.hpp"
 #include "MemSys2.hpp"
@@ -14,6 +14,7 @@
 #include "ComputePipeline.hpp"
 #include "vec_u8string_view.hpp"
 #include <fmt/core.h>
+
 
 /*todo(thr3343): 
     Maybe Add Basic (Unit) Testing.....
@@ -59,17 +60,16 @@ auto main() -> int
 
     computePipeline.BGR2RGBSwizzle(imgLoader, vkbase.PresentQueue.queue, swapChain.image);
     
-    while(IsWindow(vkbase.window))
+    while(!glfwWindowShouldClose(vkbase.window))
     {
-        static LPMSG msg;
+        
         static DWORD prevTime;
 
         const auto x = clock();
 
         
           
-       
-        PeekMessageA(msg, vkbase.window, WM_KEYFIRST, WM_MOVING, PM_REMOVE);
+        glfwPollEvents(); // PeekMessageA(msg, vkbase.window, WM_KEYFIRST, WM_MOVING, PM_REMOVE);
        
         // chkTst(vkWaitForFences(vkbase.device, 1, &R2.fence[renderer2::currentFrame], false, -1));
         R2.drawFrame();

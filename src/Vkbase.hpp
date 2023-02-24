@@ -34,7 +34,7 @@ struct Vkbase : Win
 
   uint32_t vkVer = getVer();
   VkInstance instance = createInstance();
-  VkSurfaceKHR surface = createSurface(inst, window);
+  VkSurfaceKHR surface = createSurface();
   VkPhysicalDevice physDevice = createPhysDevice();
   VkDevice device = createDevice();
   // DiscreteQueue GraphicsQueue = getQueue(0);
@@ -43,7 +43,7 @@ struct Vkbase : Win
 
   [[nodiscard]] auto getVer() -> uint32_t;
   [[nodiscard]] auto createInstance() -> VkInstance;
-  [[nodiscard]] auto createSurface(HINSTANCE inst, HWND win) -> VkSurfaceKHR;
+  [[nodiscard]] auto createSurface() -> VkSurfaceKHR;
   [[nodiscard]] auto createPhysDevice() -> VkPhysicalDevice;
   [[nodiscard]] auto createDevice() -> VkDevice;
   [[nodiscard]] auto getQueue(uint32_t) -> DiscreteQueue;

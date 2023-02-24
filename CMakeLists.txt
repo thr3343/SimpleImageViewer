@@ -49,7 +49,8 @@ target_compile_options(SimpleImageViewer PRIVATE -march=native -mtune=native -sa
 
 	add_subdirectory(VulkanMemoryAllocator)
 	add_subdirectory(fmt)
+	add_subdirectory(glfw)
 	# add_subdirectory(glslang)
 	
-	target_link_libraries(SimpleImageViewer PRIVATE VulkanMemoryAllocator fmt)
+	target_link_libraries(SimpleImageViewer PRIVATE VulkanMemoryAllocator fmt glfw)
 

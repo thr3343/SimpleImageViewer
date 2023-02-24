@@ -3,7 +3,9 @@
 #include <cstdint>
 
 
-   
+#include <GLFW/glfw3.h>
+
+  
  struct Win {
  
  
@@ -11,17 +13,19 @@
       void test();
       
         HINSTANCE inst=hInst();
-        HWND  window =init();
+        GLFWwindow*  window =init();
+        HWND hwnd = nInit();
         bool min=false;
         uint16_t X=width;
         uint16_t Y=height;
       
         auto hInst() -> HINSTANCE;
 
-        auto init() -> HWND;
+        auto init() -> GLFWwindow*;
         [[nodiscard]] auto show(bool a = false) const -> bool;
+        auto nInit() -> HWND;
 
-        static __int64 __stdcall constexpr WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+       
 };
       
     
