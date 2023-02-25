@@ -1,27 +1,29 @@
 #version 460
 #pragma shader_stage(compute)
 
-layout (local_size_x = 32) in;
+layout (local_size_x = 32, local_size_y = 32) in;
 
 
 layout(binding = 0, rgba8ui) uniform restrict uimage2D Img;
 
-
+const uint defSize=4u;
 const uvec4 A = uvec4(255<<24);
 
 void main()
 {
-	const int xx=int(gl_GlobalInvocationID.x);
+	const int xx=int(gl_GlobalInvocationID.x*defSize);
+	const int yy=int(gl_GlobalInvocationID.y*defSize);
 	//const uint yy=gl_GlobalInvocationID.y*WORKGROUP_SIZE;
 	
 	
-	for(int xOffs=xx;xOffs<xx+1080;xOffs++)
+	for(int xOffs=xx;xOffs<xx+defSize;xOffs++)
 	{
 		
+		for(int yOffs=yy; yOffs<yy+defSize; yOffs++)
 		{
 		
 			
-			imageStore(Img, ivec2(xOffs, xx), imageLoad(Img, ivec2(xOffs, xx)).bgra);
+			imageStore(Img, ivec2(xOffs, yOffs), imageLoad(Img, ivec2(xOffs, yOffs)).bgra);
 		}
 	}
 	

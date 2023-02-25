@@ -155,8 +155,9 @@ void ComputePipeline::BGR2RGBSwizzle(ImgLoader const &imgLoader, VkQueue queue, 
     // vkCmdCopyImageToBuffer(commSet.commandBuffer, TImg2.img, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, compSSBO.buff, 1, &bufferImageCopy);
     
 
-    uint64_t scaleX=(defSize/4/32/height);  
-    vkCmdDispatch(commSet.commandBuffer, scaleX, 1, 1);
+    constexpr uint64_t scaleX=(width/32);  
+    constexpr uint64_t scaleY=(height/32);  
+    vkCmdDispatch(commSet.commandBuffer, scaleX, scaleY, 1);
 
 
     // #pragma nounroll
