@@ -172,43 +172,8 @@ auto SwapChain::createSwapChain()->VkSwapchainKHR
     return doPointerAlloc5<VkSwapchainKHR>(&createInfo, vkCreateSwapchainKHR);
 }
 
-// auto SwapChain::createRenderPass(VkImageLayout initial, bool load) -> VkRenderPass
-// {
-
-//    fmt::print( "Creating RenderPass\n");
-//   VkAttachmentDescription colorAttachment
-//   {
-//     .format         = VK_FORMAT_B8G8R8A8_SRGB,  // SwapChainSupportDetails::swapChainImageFormat,
-//     .samples        = VK_SAMPLE_COUNT_1_BIT,
-//     .loadOp         = VK_ATTACHMENT_LOAD_OP_NONE_EXT,
-//     .storeOp        = VK_ATTACHMENT_STORE_OP_NONE, //Interestign Bugs: VK_ATTACHMENT_STORE_OP_STORE_DONT_CARE
-//     .stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_NONE_EXT,
-//     .stencilStoreOp = VK_ATTACHMENT_STORE_OP_NONE,
-//     .initialLayout  = initial,
-//     .finalLayout    = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-//   };
-//   VkAttachmentReference colorAttachmentRef{0, VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL};
-//   VkSubpassDescription  subpass{ .pipelineBindPoint    = VK_PIPELINE_BIND_POINT_GRAPHICS,
-//                                                   .inputAttachmentCount = 1,
-//                                                   .pInputAttachments    = &colorAttachmentRef };
-
- 
-
-//    VkRenderPassCreateInfo vkRenderPassCreateInfo1
-//    {
-//       .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-//       .attachmentCount = 1,
-//       .pAttachments    = &colorAttachment,
-//       .subpassCount    = 1,
-//       .pSubpasses      = &subpass,
-//    };
-//  
-//   return doPointerAlloc5<VkRenderPass>(&vkRenderPassCreateInfo1, vkCreateRenderPass);
-// }
-
-
-  auto SwapChain::createFramebuffers() -> VkFramebuffer
-  {
+auto SwapChain::createFramebuffers() -> VkFramebuffer
+{
         fmt::print("Creating FrameBuffers\n");
 
 
@@ -216,7 +181,7 @@ auto SwapChain::createSwapChain()->VkSwapchainKHR
     VkFramebufferAttachmentImageInfo FramebufferAttachmentImage
     {
       .sType  = VK_STRUCTURE_TYPE_FRAMEBUFFER_ATTACHMENT_IMAGE_INFO,
-      .usage  = VK_IMAGE_USAGE_TRANSFER_DST_BIT, //Nvidia Driver bug with Usages/Varients is now fixed in an eailer 473.** Driver Branch and does/no longer needs an offset tp be corrected manually
+      .usage  = VK_IMAGE_USAGE_TRANSFER_DST_BIT,
       .width  = width,
       .height = height,
       .layerCount=1,

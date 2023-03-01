@@ -30,7 +30,7 @@ VEC_CALL(__m128i) constexpr auto vmovdqu(auto P) noexcept
 */
 class [[gnu::aligned(m128Size)]] vec_u8string_view : public std::string_view 
 {
-    __v16qi _a=_mm_undefined_si128();
+    __v16qu _a=_mm_undefined_si128();
 
 
     constexpr explicit(true) vec_u8string_view(std::string_view sv, bool front=true) noexcept :
@@ -41,7 +41,7 @@ class [[gnu::aligned(m128Size)]] vec_u8string_view : public std::string_view
     public:
     auto operator == (const vec_u8string_view & ext) const noexcept -> bool {return std::bit_cast<bool>(static_cast<bool>(_mm_testc_si128(this->_a, ext._a)));}
     auto getExtensionfromSubString() -> __m128i;
-    auto stringToVecView(std::string_view) -> __v16qi;
+    auto stringToVecView(std::string_view) -> __v16qu;
     static inline auto initHelper(std::string_view ext) -> vec_u8string_view;
 };
 

@@ -15,6 +15,9 @@
 
 struct ComputePipeline : MemSys2
 {
+    VkCommSet commSet;
+    vmaImage compSSBO;
+    
     explicit ComputePipeline(MemSys2 const& Memsys, const SwapChain& swapChain) noexcept : 
             commSet{Memsys, Memsys.q.queuefamilyVarient}, 
             compSSBO(allocImg(defres, defSize, VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_TRANSFER_SRC_BIT|VK_IMAGE_USAGE_STORAGE_BIT)), 
@@ -23,8 +26,7 @@ struct ComputePipeline : MemSys2
                 compSSBO.view=swapChain.createImageView(compSSBO);
                 updateDescriptorSetArray(compSSBO.size);
             };
-    VkCommSet commSet;
-    vmaImage compSSBO;
+            
     VkDescriptorType descriptorVarient=determineDescriptorVarient(compSSBO);
     VkDescriptorSetLayout compDescriptorSetLayout=setupDescriptorSetLayout();
     VkPipelineLayout compPipelineLayout=setupLayout();
@@ -32,12 +34,14 @@ struct ComputePipeline : MemSys2
     // VkPipelineCache compPipelineCache;
     VkDescriptorPool compDescriptorPool=setupDescriptorPool();
     VkDescriptorSet compDescriptorSet=allocDescriptorSet();
+
     [[nodiscard]] auto setupPipeline() const -> VkPipeline;
     [[nodiscard]] auto setupDescriptorSetLayout() const -> VkDescriptorSetLayout;
     [[nodiscard]] auto setupLayout() const -> VkPipelineLayout;
     [[nodiscard]] auto setupDescriptorPool() const -> VkDescriptorPool;
     [[nodiscard]] auto allocDescriptorSet() const -> VkDescriptorSet;
     [[nodiscard, gnu::pure]] auto determineDescriptorVarient(vmaImage) const -> VkDescriptorType;
+
     void updateDescriptorSetArray(uint32_t=defSize) const noexcept;
     void resizeThis(uint32_t=defSize) noexcept;
     void reLoad();

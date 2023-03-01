@@ -1,20 +1,16 @@
 
 #include <cassert>
 #include <cstdint>
-
 #include <ctime>
-#include <vulkan/vulkan_core.h>
 
-
-#include "GLFW/glfw3.h"
-#include "VkCtx.hpp"
-#include "VkCommSet.hpp"
+#include "Vkbase.hpp"
+#include "SwapChain.hpp"
 #include "MemSys2.hpp"
 #include "ImgLoader.hpp"
 #include "renderer2.hpp"
 #include "ComputePipeline.hpp"
 #include "vec_u8string_view.hpp"
-#include <fmt/core.h>
+
 
 
 /*todo(thr3343): 
@@ -40,7 +36,6 @@ namespace
 uint32_t i;
 uint32_t tmSecs;
 
-// constexpr __v16qi aDot={'.','.','.','.','.','.','1','.','.','.','.','.','.','.','.','.'};
    consteval std::string_view minDef(std::string_view a, int ax=16)
    {
         return std::string_view{a.cend()-16, 16};
@@ -72,7 +67,7 @@ auto main() -> int
           
         glfwPollEvents(); // PeekMessageA(msg, vkbase.window, WM_KEYFIRST, WM_MOVING, PM_REMOVE);
        
-        // chkTst(vkWaitForFences(vkbase.device, 1, &R2.fence[renderer2::currentFrame], false, -1));
+    
         R2.drawFrame();
         
 
@@ -97,40 +92,26 @@ void renderer2::drawFrame() const noexcept
 {
 
   chkTst(vkWaitForFences(vkbase.device, 1, &R2.fence2[currentFrame], false, -1));
+
   vkResetFences(vkbase.device, 1, &R2.fence2[currentFrame]);
+  
   //TODO(thr3343): Replace fence Setup with Semaphore
-  chkTst(vkAcquireNextImageKHR( vkbase.device, swapChain.swapchain, -1, nullptr, fence2[renderer2::currentFrame], reinterpret_cast<uint32_t*>(&imgIndx) ));
+  chkTst(vkAcquireNextImageKHR( vkbase.device, swapChain.swapchain, -1, nullptr, fence2[renderer2::currentFrame], &imgIndx ));
   
-  constexpr VkPipelineStageFlags t=VK_PIPELINE_STAGE_TRANSFER_BIT;
-      // const VkSubmitInfo info
-      // {
-      //         .sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-      //           .waitSemaphoreCount=1,
-      //           .pWaitSemaphores=&PresentSemaphore[currentFrame],
-      //         .pWaitDstStageMask  = &t,
-      //         .commandBufferCount = 1,
-      //         .pCommandBuffers= commandBuffer.begin(),
-      //         .signalSemaphoreCount=1,
-      //         .pSignalSemaphores=&PresentSemaphore[currentFrame]
-      // };
 
-//  vkResetFences(vkbase.device, 1, &R2.fence[renderer2::imgIndx]);
-    // chkTst(vkQueueSubmit( vkbase.PresentQueue.queue, 1, &info, fence[imgIndx]));
- 
-  
-    const VkPresentInfoKHR VkPresentInfoKHR1{ .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-                                                                    // .pWaitSemaphores=&PresentSemaphore[currentFrame],
-                                                                    .swapchainCount = 1,
-                                                                    .pSwapchains    = &swapChain.swapchain,
-                                                                    .pImageIndices  = reinterpret_cast<uint32_t*>(&imgIndx),
-                                                                    .pResults       = nullptr };
+      
+  constexpr VkPresentInfoKHR VkPresentInfoKHR1 alignas(32)
+  { 
+    .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+    .swapchainCount = 1,
+    .pSwapchains    = &swapChain.swapchain,
+    .pImageIndices  = (&imgIndx),
+    .pResults       = nullptr 
+  };
 
 
-
-
-//   chkTst(vkWaitForFences(vkbase.device, 1, &fence[imgIndx], false, -1));
-  
   currentFrame=++currentFrame%Frames;
+
   chkTst(vkQueuePresentKHR( vkbase.PresentQueue.queue, &VkPresentInfoKHR1 ));
 
 }

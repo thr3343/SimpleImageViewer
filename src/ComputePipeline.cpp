@@ -51,79 +51,79 @@
 [[nodiscard]] auto ComputePipeline::setupDescriptorPool() const -> VkDescriptorPool
 {
     
-                VkDescriptorPoolSize poolSizes
-                {
-                    .type=descriptorVarient,
-                    .descriptorCount=1,
-                };
+    VkDescriptorPoolSize poolSizes
+    {
+        .type=descriptorVarient,
+        .descriptorCount=1,
+    };
 
 
-                VkDescriptorPoolCreateInfo VkQueryPoolCreateInfo
-                {
-                    .sType=VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-                    .maxSets=1,
-                    .poolSizeCount=1,
-                    .pPoolSizes=&poolSizes,
-                };
+    VkDescriptorPoolCreateInfo VkQueryPoolCreateInfo
+    {
+        .sType=VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+        .maxSets=1,
+        .poolSizeCount=1,
+        .pPoolSizes=&poolSizes,
+    };
 
-              return doPointerAlloc5<VkDescriptorPool>(&VkQueryPoolCreateInfo, vkCreateDescriptorPool);
+    return doPointerAlloc5<VkDescriptorPool>(&VkQueryPoolCreateInfo, vkCreateDescriptorPool);
 }
 [[nodiscard]] auto ComputePipeline::allocDescriptorSet() const -> VkDescriptorSet
 {
    
 
-            VkDescriptorSetAllocateInfo allocInfo
-            {
-                .sType=VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-                .descriptorPool=compDescriptorPool,
-                .descriptorSetCount=1,
-                .pSetLayouts=&compDescriptorSetLayout,
-            };
+    VkDescriptorSetAllocateInfo allocInfo
+    {
+        .sType=VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+        .descriptorPool=compDescriptorPool,
+        .descriptorSetCount=1,
+        .pSetLayouts=&compDescriptorSetLayout,
+    };
 
 
 
-            VkDescriptorSet pDescriptorSet;
+    VkDescriptorSet pDescriptorSet;
 
-            vkAllocateDescriptorSets(tmpDevice_, &allocInfo, &pDescriptorSet);
+    vkAllocateDescriptorSets(tmpDevice_, &allocInfo, &pDescriptorSet);
 
 
-            return pDescriptorSet;
+    return pDescriptorSet;
         
 }
 
 void ComputePipeline::updateDescriptorSetArray(uint32_t size) const noexcept
 {
-     VkDescriptorImageInfo imgInfos
-     {
-           .sampler=nullptr,
-           .imageLayout=compSSBO.current,
-           .imageView=compSSBO.view
-     };
+    VkDescriptorImageInfo imgInfos
+    {
+        .sampler=nullptr,
+        .imageLayout=compSSBO.current,
+        .imageView=compSSBO.view
+    };
 
 
 
-        VkWriteDescriptorSet ssboDescriptorWrite
-        {
-            .sType=VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-            .dstSet=compDescriptorSet,
-            .dstBinding=0,
-            .dstArrayElement=0,
-            .descriptorCount=1,
-            .descriptorType=descriptorVarient,
-            .pImageInfo=&imgInfos,
-        };
+    VkWriteDescriptorSet ssboDescriptorWrite
+    {
+        .sType=VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+        .dstSet=compDescriptorSet,
+        .dstBinding=0,
+        .dstArrayElement=0,
+        .descriptorCount=1,
+        .descriptorType=descriptorVarient,
+        .pImageInfo=&imgInfos,
+    };
 
 
 
-        vkUpdateDescriptorSets(tmpDevice_, 1, &ssboDescriptorWrite, 0, nullptr);
+    vkUpdateDescriptorSets(tmpDevice_, 1, &ssboDescriptorWrite, 0, nullptr);
 }
 void ComputePipeline::resizeThis(uint32_t size) noexcept
 {       
-           vmaUnmapMemory(a, compSSBO.alloc);
-            vmaDestroyImage(a, compSSBO.img, compSSBO.alloc);
-            compSSBO = allocImg(defres,defSize,compSSBO.usageFlags, compSSBO.view);
-            updateDescriptorSetArray(size);
-            vmaMapMemory(a, compSSBO.alloc, &data);
+    vmaUnmapMemory(a, compSSBO.alloc);
+    vmaDestroyImage(a, compSSBO.img, compSSBO.alloc);
+    compSSBO = allocImg(defres,defSize,compSSBO.usageFlags, compSSBO.view);
+    updateDescriptorSetArray(size);
+    vmaMapMemory(a, compSSBO.alloc, &data);
      
 }
 
@@ -151,10 +151,6 @@ void ComputePipeline::BGR2RGBSwizzle(ImgLoader const &imgLoader, VkQueue queue, 
         .srcSubresource=subresource,
         .extent=defres
     };
-
-    // vkCmdCopyImageToBuffer(commSet.commandBuffer, TImg2.img, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, compSSBO.buff, 1, &bufferImageCopy);
-    
-
     constexpr uint64_t scaleX=(width/32);  
     constexpr uint64_t scaleY=(height/32);  
     vkCmdDispatch(commSet.commandBuffer, scaleX, scaleY, 1);
@@ -163,9 +159,9 @@ void ComputePipeline::BGR2RGBSwizzle(ImgLoader const &imgLoader, VkQueue queue, 
     // #pragma nounroll
     for(const VkImage &img : image) 
     {
-    imgLoader.transitionImageLayout(commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, img);
-    vkCmdCopyImage(commSet.commandBuffer, compSSBO.img, compSSBO.current, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
-    imgLoader.transitionImageLayout(commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, img);
+        imgLoader.transitionImageLayout(commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, img);
+        vkCmdCopyImage(commSet.commandBuffer, compSSBO.img, compSSBO.current, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
+        imgLoader.transitionImageLayout(commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, img);
     }
     commSet.endSingleTimeCommands(queue, true, false);
 }
@@ -200,8 +196,7 @@ void ComputePipeline::BGR2RGBSwizzle(ImgLoader const &imgLoader, VkQueue queue, 
         .stage=compShaderStageInfo,
         .layout=compPipelineLayout,
         .basePipelineHandle=VK_NULL_HANDLE,
-        .basePipelineIndex=-1
-       
+        .basePipelineIndex=-1     
     };
 
     VkPipeline compPipeLine;

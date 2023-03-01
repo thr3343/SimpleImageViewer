@@ -8,7 +8,7 @@
 }
 
 
-auto vec_u8string_view::stringToVecView(std::string_view string_view) -> __v16qi
+auto vec_u8string_view::stringToVecView(std::string_view string_view) -> __v16qu
 {
   const_reverse_iterator rItr=string_view.crend();
   int i;

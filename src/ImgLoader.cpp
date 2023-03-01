@@ -41,17 +41,16 @@ auto ImgLoader::doGenCommnd(uint32_t count, VkCommandPool commandPool) const -> 
 
 void ImgLoader::copyImage2Image(vmaImage vkImage, VkCommandBuffer commandBufferSets, VkImage stagingBuffer) const
 {
-    constexpr   VkImageCopy copyRegion
+    constexpr VkImageCopy copyRegion
     {
       .srcSubresource=subresource,
-      .srcOffset=VkOffset3D{0, 0, 0},
+      .srcOffset=VkOffset3D{},
       .dstSubresource=subresource,
-	    .dstOffset=VkOffset3D{0, 0, 0},
+	    .dstOffset=VkOffset3D{},
       .extent=defres
-
     };
     
-  // fmt::print("Allocating img:");
+
 	//copy the buffer into the image
     constexpr VkCommandBufferBeginInfo beginInfo1 = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
                                                     .flags = ( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT) };
@@ -60,15 +59,8 @@ void ImgLoader::copyImage2Image(vmaImage vkImage, VkCommandBuffer commandBufferS
     transitionImageLayout(commandBufferSets, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, stagingBuffer);
     vkCmdCopyImage(commandBufferSets, vkImage.img, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, stagingBuffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
     transitionImageLayout(commandBufferSets, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, stagingBuffer);
-    // vkImage.current=VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
   }
-  
   vkEndCommandBuffer( commandBufferSets );
-
-
-        // fmt::print("%s %ld \n", "Copied Buff-ToImg in :", clock() - a/CLOCKS_PER_SEC);
-
-    
 }
 
 
@@ -85,12 +77,8 @@ vmaImage copyBuffer2Image(vmaImage &vkImage, VkCommSet commandBufferSets, vmaBuf
   fmt::print("Allocating img:");
 	//copy the buffer into the image
   
-  {
-    vkCmdCopyBufferToImage(commandBufferSets.commandBuffer, stagingBuffer.buff, vkImage.img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
-    // transitionImageLayout(commandBufferSets.commandBuffer, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, vkImage.img);
-    // vkImage.current=VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-  }
-  
+  vkCmdCopyBufferToImage(commandBufferSets.commandBuffer, stagingBuffer.buff, vkImage.img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+
         // fmt::print("%s %ld \n", "Copied Buff-ToImg in :", clock() - a/CLOCKS_PER_SEC);
 
     return vkImage;
@@ -129,12 +117,7 @@ void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaImage vma
     vmaUnmapMemory(this->a, stagingBuffer.alloc);
         fmt::print("Copied Image in : {}\n", clock() - a/CLOCKS_PER_SEC);
 
-	  // memSys::mapMem(limg, imageSize);
 
-	// tstA::freeImg(limg);
-
-   
-    // auto vkImage= allocImg(defres, imageSize, VK_IMAGE_USAGE_TRANSFER_SRC_BIT|VK_IMAGE_USAGE_TRANSFER_DST_BIT);
     transitionImageLayout(commandBufferSets.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, vmaImage.img);
     vmaImage.current=VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
     copyBuffer2Image(vmaImage, commandBufferSets, stagingBuffer, queue);
@@ -275,38 +258,3 @@ void ImgLoader::transitionImageLayout( VkCommandBuffer commandBuffer, VkFormat f
   auto asp3 = static_cast<float>(extent.width)/extent.height;
   return (asp3>asp) ? VkOffset2D{static_cast<int>(height-(width/asp3)), 0} : VkOffset2D{0, static_cast<int>(fma2(width, asp3, -width))};
 }
-
-
-/* void ImgLoader::vkRecImg(VkImage const& img, int a, VkQueue queue) const
-{
-  auto xyl=aspect(VkExtent2D{width, height});
-  int aa = fma2(width, height, 10);
-  
-  VkImageBlit imgBlt
-  {
-    .srcSubresource=subresource,
-    .srcOffsets={{0,0,0},VkOffset3D{width, height, 1}},
-    .dstSubresource=subresource,
-    .dstOffsets={{-xyl.y,xyl.x,0},{width+(xyl.y>>1),height-(xyl.x>>1),1}},
-  };
-
-
-    constexpr VkRect2D renderArea = { .offset = { 0, 0 }, .extent = {width, height} };
-
-
-  
-  static constexpr VkDeviceSize offsets[] = { 0 };
-
-  VkCommSet commSet{*this};
-
-  commSet.beginSingleTimeCommands();
-  vkCmdBlitImage(commSet.commandBuffer, vmaImg.img, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &imgBlt, VK_FILTER_LINEAR);
-        
-
-  
-  transitionImageLayout(commSet.commandBuffer, VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, img);
-
-  commSet.endSingleTimeCommands(queue, false);
-
-  
-} */
