@@ -6,6 +6,7 @@
 #include <vulkan/vulkan_core.h>
 
 
+#include "GLFW/glfw3.h"
 #include "VkCtx.hpp"
 #include "VkCommSet.hpp"
 #include "MemSys2.hpp"
@@ -87,7 +88,7 @@ auto main() -> int
     }
 
     fmt::print("No Window! \n");
-
+    glfwDestroyWindow(vkbase.window);
     swapChain.~SwapChain();
     vkbase.~Vkbase();
 }

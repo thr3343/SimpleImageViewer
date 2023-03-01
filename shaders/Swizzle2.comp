@@ -11,8 +11,8 @@ const uvec4 A = uvec4(255<<24);
 
 void main()
 {
-	const int xx=int(gl_GlobalInvocationID.x);
-	const int yy=int(gl_GlobalInvocationID.y);
+	const uint xx = (gl_GlobalInvocationID.x);
+	const uint yy = (gl_GlobalInvocationID.y);
 	//const uint yy=gl_GlobalInvocationID.y*WORKGROUP_SIZE;
 	
 	
