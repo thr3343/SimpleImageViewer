@@ -1,5 +1,6 @@
 #include "ImgLoader.hpp"
 #include <vk_mem_alloc.h>
+#include "fmt/core.h"
 #include "imgLud.hpp"
 #include "vec_u8string_view.hpp"
 

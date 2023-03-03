@@ -51,6 +51,7 @@ target_compile_options(SimpleImageViewer PRIVATE -march=native -mtune=native -sa
 			$<$<COMPILE_LANGUAGE:C>:<GLFW/glfw3.h$<ANGLE-R>>
 			$<$<COMPILE_LANGUAGE:C>:<vulkan/vk_platform.h$<ANGLE-R>>
 			$<$<COMPILE_LANGUAGE:C>:<vulkan/vulkan_core.h$<ANGLE-R>>
+			$<$<COMPILE_LANGUAGE:C>:<vulkan/vulkan_win32.h$<ANGLE-R>>
 			$<$<COMPILE_LANGUAGE:C>:<fmt/core.h$<ANGLE-R>>
 			$<$<COMPILE_LANGUAGE:C>:<string$<ANGLE-R>>
 			$<$<COMPILE_LANGUAGE:C>:<stb_image.h$<ANGLE-R>>

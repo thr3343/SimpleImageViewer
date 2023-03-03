@@ -3,6 +3,7 @@
 #include "SwapChain.hpp"
 #include "MemSys2.hpp"
 #include "ImgLoader.hpp"
+#include "fmt/core.h"
 #include "renderer2.hpp"
 #include "ComputePipeline.hpp"
 
