@@ -1,4 +1,5 @@
 #pragma once
+#define VK_NO_STDDEF_H
 #include "defs.tpp"
 #include <cstdint>
 #include <fmt/core.h>
@@ -13,10 +14,10 @@ using PFN_vkVoidFunction = void (VKAPI_PTR*)(void);
 
 struct [[gnu::aligned(32)]] Tmp
 {
-  VkInstance tmpInst_;
-  VkDevice tmpDevice_;
-  VkPhysicalDevice tmpPhysDevice_;
-  VkSurfaceKHR tmpSurface_;
+  [[no_unique_address]] VkInstance tmpInst_;
+  [[no_unique_address]] VkDevice tmpDevice_;
+  [[no_unique_address]] VkPhysicalDevice tmpPhysDevice_;
+  [[no_unique_address]] VkSurfaceKHR tmpSurface_;
 //  PFN_vkCreateCommandPool a_;
     template<typename type>
     [[nodiscard]] constexpr  auto doPointerAlloc5(auto* __restrict__ strct, auto pHndle) const noexcept -> type

@@ -1,6 +1,5 @@
 #pragma once
 #include "defs.tpp"
-#include "TMp.hpp"
 #include "Win.hpp"
 #include <cstdint>
 //#define VK_NO_PROTOTYPES

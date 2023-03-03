@@ -1,5 +1,11 @@
 #pragma once
+#define VULKAN_H_ 1
+
 #include <cstdint>
+#define _LIBCPP_CSTDINT
+#define _LIBCPP_STDINT_H
+#define _LIBCPP___ASSERT
+#define _LIBCPP___CONFIG
 
 #define VEC_CALL(vec) [[nodiscard, gnu::const, gnu::nodebug, gnu::aligned(32), clang::min_vector_width(sizeof(vec))]]  
 
@@ -53,3 +59,5 @@ using VmaAllocation = struct VmaAllocation_T*;
     using UINT = unsigned int;
 
 
+// .Misc
+using GLFWwindow = struct GLFWwindow;

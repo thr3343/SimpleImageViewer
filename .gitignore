@@ -40,3 +40,4 @@ fmt/
 fast_io/
 stb/
 glfw/
+*.idx

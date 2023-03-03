@@ -1,6 +1,6 @@
 #pragma once
 #include "defs.tpp"
-#include <bit>
+
 #include <immintrin.h>
 #include <string_view>
 

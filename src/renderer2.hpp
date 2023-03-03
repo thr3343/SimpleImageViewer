@@ -16,7 +16,7 @@ struct [[clang::trivial_abi]] renderer2 : Tmp
   [[gnu::hot, gnu::always_inline]] inline void drawFrame() const noexcept;
 
 
-   renderer2(Tmp tmp): Tmp{tmp}{};
+   explicit renderer2(Tmp tmp): Tmp{tmp}{};
 
   static constinit inline uint32_t               imgIndx;
   static constinit inline uint8_t               currentFrame;

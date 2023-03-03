@@ -1,12 +1,6 @@
 #include "ImgLoader.hpp"
-#include <array>
-#include <cstdint>
-#include <ctime>
-#include <smmintrin.h>
 #include <vk_mem_alloc.h>
-#include <vulkan/vulkan_core.h>
 #include "imgLud.hpp"
-#include "VkCommSet.hpp"
 #include "vec_u8string_view.hpp"
 
 

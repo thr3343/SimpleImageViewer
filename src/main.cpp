@@ -1,15 +1,11 @@
-
-#include <cassert>
-#include <cstdint>
-#include <ctime>
-
+#include <GLFW/glfw3.h>
 #include "Vkbase.hpp"
 #include "SwapChain.hpp"
 #include "MemSys2.hpp"
 #include "ImgLoader.hpp"
 #include "renderer2.hpp"
 #include "ComputePipeline.hpp"
-#include "vec_u8string_view.hpp"
+
 
 
 
@@ -48,11 +44,7 @@ auto main() -> int
     Maybe Add Basic (Unit) Testing.....
     *Directory recursion/Recursive Directory Walking...
 */
-    vec_u8string_view directoryHandler=vec_u8string_view::initHelper({"testtesttesttesttesttesttesttesttesttest.png"});
-    vec_u8string_view directoryHandler2=vec_u8string_view::initHelper({"test.png"});
-
-    printf("%s\n",directoryHandler.getExtensionfromSubString());
-    printf("%s\n",directoryHandler==directoryHandler2?"OK":"FAIL!");
+   
 
     computePipeline.BGR2RGBSwizzle(imgLoader, vkbase.PresentQueue.queue, swapChain.image);
     

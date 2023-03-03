@@ -1,18 +1,19 @@
 #include "Win.hpp"
 #include <cstdint>
+#include <cstdio>
 
 #define GLFW_EXPOSE_NATIVE_WIN32
-
+#include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
-#include <fmt/core.h>
-#include <fmt/format.h>
+
+
 
 
 
 // using QWORD = uint64_t;
 
 extern  constinit const HINSTANCE   __ImageBase;
-const auto _hInst = (HINSTANCE)&__ImageBase;
+
 
 auto Win::nInit() -> HWND
 {
@@ -21,7 +22,7 @@ auto Win::nInit() -> HWND
 
 auto Win::hInst() -> HINSTANCE
 {
-  return (_hInst);
+  return (__ImageBase);
 }
 
 auto Win::init() -> GLFWwindow*
@@ -58,19 +59,19 @@ if (!glfwInit())
     glfwWindowHint(GLFW_CONTEXT_CREATION_API , GLFW_NATIVE_CONTEXT_API);
     GLFWwindow* window = glfwCreateWindow(width, height, "My Title", NULL, NULL);
     
-   fmt::print("__ImageBase.ImageBase{}\n",fmt::ptr(&__ImageBase));
-   fmt::print("__ImageBase.ImageBase{}\n", fmt::ptr(_hInst));
-   fmt::print("__ImageBase.ImageBase{}\n", fmt::ptr(GetModuleHandle(NULL)));
-   fmt::print("__ImageBase.ImageBase{}\n",fmt::ptr(inst));
+   printf("__ImageBase.ImageBase{} %llx\n", (&__ImageBase));
+  //  printf("__ImageBase.ImageBase{} %llx\n", (_hInst));
+   printf("__ImageBase.ImageBase{} %llx\n", (GetModuleHandle(NULL)));
+   printf("__ImageBase.ImageBase{} %llx\n", (inst));
   //  Win::min= glfwGetWin32Window(window);
 
  
-  fmt::print("OK!\n");
+  printf("OK!\n");
   return window;
 };
 
   [[nodiscard]] auto Win::show(bool a) const -> bool
   {
-    fmt::print("%z", a?"SHOW":"HIDE");
+    printf("%s", a?"SHOW":"HIDE");
       return 1;//ShowWindow(window, a?6:5);
   }

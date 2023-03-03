@@ -3,8 +3,7 @@
 #include "MemSys2.hpp"
 #include "Vkbase.hpp"
 #include "VkCommSet.hpp"
-#include <array>
-#include <cstdint>
+
 
 struct ImgLoader:MemSys2
 {

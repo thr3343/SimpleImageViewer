@@ -18,7 +18,7 @@ target_compile_options(SimpleImageViewer PRIVATE -march=native -mtune=native -sa
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/Vkbase.cpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/SwapChain.hpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/SwapChain.cpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/VkCtx.hpp"
+
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/defs.tpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/VkCommSet.hpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/VkCommSet.cpp"
@@ -45,7 +45,18 @@ target_compile_options(SimpleImageViewer PRIVATE -march=native -mtune=native -sa
 	
 	
 	target_include_directories(SimpleImageViewer PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/fast_io/include stb)
-	
+	target_precompile_headers(SimpleImageViewer 
+		PRIVATE 
+		
+			$<$<COMPILE_LANGUAGE:C>:<GLFW/glfw3.h$<ANGLE-R>>
+			$<$<COMPILE_LANGUAGE:C>:<vulkan/vk_platform.h$<ANGLE-R>>
+			$<$<COMPILE_LANGUAGE:C>:<vulkan/vulkan_core.h$<ANGLE-R>>
+			$<$<COMPILE_LANGUAGE:C>:<fmt/core.h$<ANGLE-R>>
+			$<$<COMPILE_LANGUAGE:C>:<string$<ANGLE-R>>
+			$<$<COMPILE_LANGUAGE:C>:<stb_image.h$<ANGLE-R>>
+			
+
+	)
 
 	add_subdirectory(VulkanMemoryAllocator)
 	add_subdirectory(fmt)
