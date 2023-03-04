@@ -52,7 +52,7 @@ auto main() -> int
     while(!glfwWindowShouldClose(vkbase.window))
     {
         
-        static DWORD prevTime;
+        static constinit DWORD prevTime;
 
         const auto x = clock();
 

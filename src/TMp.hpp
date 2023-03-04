@@ -4,13 +4,12 @@
 #include "defs.tpp"
 #include <cstdint>
 #include <cstdlib>
-#include <vulkan/vk_platform.h>
 
 
 
 
-using callArg = int (VKAPI_PTR*)(VkDevice device, const void* pCreateInfo, const void* pAllocator, void* pCommandPool);
-using PFN_vkVoidFunction = void (VKAPI_PTR*)(void);
+
+
 
 struct [[gnu::aligned(32)]] Tmp
 {
@@ -23,7 +22,7 @@ struct [[gnu::aligned(32)]] Tmp
     [[nodiscard]] constexpr  auto doPointerAlloc5(auto* __restrict__ strct, auto pHndle) const noexcept -> type
     {
         type pHndl; 
-        reinterpret_cast<callArg>(pHndle)(tmpDevice_, strct, nullptr, &pHndl);
+        pHndle(tmpDevice_, strct, nullptr, &pHndl);
       
         return pHndl;
     };

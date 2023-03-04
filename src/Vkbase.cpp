@@ -10,8 +10,11 @@
 constexpr bool ENABLE_VALIDATION_LAYERS = false;
 
 constexpr auto *validationLayers = "VK_LAYER_KHRONOS_validation";
-constexpr auto extensions= std::to_array({ VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME});
-auto Vkbase::getVer() -> uint32_t
+constexpr auto extensions       = std::to_array({ VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME}); 
+
+constexpr auto valdFeatures     = std::to_array({ VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT, VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT});
+
+auto Vkbase::getVer()  const noexcept -> uint32_t
 {
         uint32_t a;
         vkEnumerateInstanceVersion(&a);
@@ -24,9 +27,7 @@ auto Vkbase::getVer() -> uint32_t
 
 auto Vkbase::createInstance() -> VkInstance
 {
-        static constexpr auto valdFeatures       = { VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT,
-                                                                   VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT,
-                                                                   VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT};
+        
 
         constexpr VkValidationFeaturesEXT  extValidationFeatures
         {
@@ -107,13 +108,13 @@ auto Vkbase::createPhysDevice() -> VkPhysicalDevice
 {
   fmt::print( "Picking Physical Device\n");
    uint32_t deviceCount;
-  vkEnumeratePhysicalDevices( instance, &deviceCount, nullptr ) ;
+   vkEnumeratePhysicalDevices( instance, &deviceCount, nullptr ) ;
 
  
    std::vector<VkPhysicalDevice> ppPhysicalDevicesdeviceCount(deviceCount);
 
-  fmt::print("Enumerate Physical Device\n");
-  vkEnumeratePhysicalDevices( instance, &deviceCount, ppPhysicalDevicesdeviceCount.data() );
+   fmt::print("Enumerate Physical Device\n");
+   vkEnumeratePhysicalDevices( instance, &deviceCount, ppPhysicalDevicesdeviceCount.data() );
 
 for(VkPhysicalDevice physDevs : ppPhysicalDevicesdeviceCount)
 {
@@ -160,7 +161,7 @@ auto Vkbase::createDevice() -> VkDevice
 //         1,
 //         &priority,
 //  }; 
- const VkDeviceQueueCreateInfo deviceQueueCreateInfo3 
+ VkDeviceQueueCreateInfo deviceQueueCreateInfo3 
  {
         VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
         nullptr,
@@ -169,8 +170,8 @@ auto Vkbase::createDevice() -> VkDevice
         1,
         &priority,
  };
-auto queueSetInitList ={deviceQueueCreateInfo3};
- static VkPhysicalDeviceVulkan13Features vk13F
+ auto queueSetInitList ={deviceQueueCreateInfo3};
+  VkPhysicalDeviceVulkan13Features vk13F
   {
     .sType=VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
     .pNext=nullptr,
@@ -178,7 +179,7 @@ auto queueSetInitList ={deviceQueueCreateInfo3};
   };
 
 
-  static VkPhysicalDeviceVulkan12Features deviceVulkan12Features = {
+   VkPhysicalDeviceVulkan12Features deviceVulkan12Features = {
     .sType                           = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
     .pNext                           = &vk13F,
     .descriptorBindingPartiallyBound = true,
@@ -186,7 +187,7 @@ auto queueSetInitList ={deviceQueueCreateInfo3};
 
   };
 
-  static constexpr VkPhysicalDeviceFeatures deviceFeatures{};
+ 
 
   VkPhysicalDeviceFeatures2 deviceFeatures2 = { .sType    = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
                                                 .pNext    = &deviceVulkan12Features,
@@ -194,6 +195,7 @@ auto queueSetInitList ={deviceQueueCreateInfo3};
 
 
   vkGetPhysicalDeviceFeatures2( physDevice, &deviceFeatures2 );
+
         constexpr auto * deviceExtensions = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
 
         // constexpr uint32_t extCount= extensions.size();

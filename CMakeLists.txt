@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 3.25)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project(SimpleImageViewer LANGUAGES CXX)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 add_executable(SimpleImageViewer)
-add_compile_definitions(SimpleImageViewer PRIVATE WIN32_LEAN_AND_MEAN VK_USE_PLATFORM_WIN32_KHR)
+add_compile_definitions(SimpleImageViewer PRIVATE WIN32_LEAN_AND_MEAN VK_USE_PLATFORM_WIN32_KHR _GLFW_VULKAN_STATIC)
 target_compile_features(SimpleImageViewer PRIVATE cxx_std_23)
 # target_compile_features(SimpleImageViewer PRIVATE c_std_23)
 # target_link_options(SimpleImageViewer PRIVATE -fsanitize=address,undefined)
@@ -11,32 +13,36 @@ target_compile_options(SimpleImageViewer PRIVATE -march=native -mtune=native -sa
 
 	target_sources(SimpleImageViewer
 		PRIVATE
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/Win.hpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/Win.cpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/Vkbase.hpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/Vkbase.cpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/SwapChain.hpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/SwapChain.cpp"
-
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/defs.tpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/VkCommSet.hpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/VkCommSet.cpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/MemSys2.hpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/MemSys2.cpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/ImgLoader.hpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/ImgLoader.cpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/imgLud.hpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/imgLud.cpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/renderer2.hpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/ComputePipeline.hpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/ComputePipeline.cpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/vec_u8string_view.hpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/vec_u8string_view.cpp"
+		FILE_SET HEADERS
+		BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src"
+		FILES
+			"src/MemSys2.hpp"
+			"src/defs.tpp"
+			"src/Win.hpp"
+			"src/renderer2.hpp"
+			"src/Vkbase.hpp"
+			"src/imgLud.hpp"
+			"src/ImgLoader.hpp"
+			"src/SwapChain.hpp"
+			"src/vec_u8string_view.hpp"
+			"src/ComputePipeline.hpp"
+			"src/VkCommSet.hpp"
+			
+		PRIVATE	
+			"src/main.cpp"
+			"src/SwapChain.cpp"
+			"src/Vkbase.cpp"
+			"src/Win.cpp"
+			"src/VkCommSet.cpp"
+			"src/MemSys2.cpp"
+			"src/ImgLoader.cpp"
+			"src/imgLud.cpp"
+			"src/ComputePipeline.cpp"
+			"src/vec_u8string_view.cpp"
 			
 	)
 	find_package(Vulkan REQUIRED)
-	include_directories(shaders)
+	
 	
 
 	# find_library(SPIRV STATIC "$ENV{VULKAN_SDK}/Lib/")
@@ -44,17 +50,21 @@ target_compile_options(SimpleImageViewer PRIVATE -march=native -mtune=native -sa
 
 	
 	
-	target_include_directories(SimpleImageViewer PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/fast_io/include stb)
+	target_sources(SimpleImageViewer PRIVATE FILE_SET HEADERS BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/stb" FILES "stb/stb_image.h")
+	
+	
 	target_precompile_headers(SimpleImageViewer 
 		PRIVATE 
 		
-			$<$<COMPILE_LANGUAGE:C>:<GLFW/glfw3.h$<ANGLE-R>>
-			$<$<COMPILE_LANGUAGE:C>:<vulkan/vk_platform.h$<ANGLE-R>>
-			$<$<COMPILE_LANGUAGE:C>:<vulkan/vulkan_core.h$<ANGLE-R>>
-			$<$<COMPILE_LANGUAGE:C>:<vulkan/vulkan_win32.h$<ANGLE-R>>
-			$<$<COMPILE_LANGUAGE:C>:<fmt/core.h$<ANGLE-R>>
-			$<$<COMPILE_LANGUAGE:C>:<string$<ANGLE-R>>
-			$<$<COMPILE_LANGUAGE:C>:<stb_image.h$<ANGLE-R>>
+			$<$<COMPILE_LANGUAGE:C>:
+				GLFW/glfw3.h
+				vulkan/vk_platform.h
+				vulkan/vulkan_core.h
+				vulkan/vulkan_win32.h
+				fmt/core.h
+				string
+				string_view
+				stb_image.h>
 			
 
 	)

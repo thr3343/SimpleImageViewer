@@ -3,6 +3,7 @@
 #include "fmt/core.h"
 #include "imgLud.hpp"
 #include "vec_u8string_view.hpp"
+#include <filesystem>
 
 
 auto ImgLoader::genCommPool(uint32_t QueuefamilyIndex) const -> VkCommandPool
@@ -79,17 +80,32 @@ vmaImage copyBuffer2Image(vmaImage &vkImage, VkCommSet commandBufferSets, vmaBuf
     return vkImage;
 }
 
+//TODO() Create Fake image to fill the Framebuffer>Swapchain Image if Dedocded/Decomrpessed bitMap s too small
+//or PRefill All SwpChain Images with a Def.Balck bakcground via Image Copy to SwapChain Dierctly overwirte any occluded Pixels
+
+//?Esit* nto nessacery as an empty SwpChain>faremBuffer is Empty.black/Uninitialised Anyway, Only Scaling is needed/isues onyl occur is Resolution is Smaller than : may onyl be needed of a Custom>rpedefied/Effects Derived e.g. .msic.e,t.ce. .e bakcGround is Derived.used/Imepelemted.levarge.dieucaycdbfdu e.g.demfkd
+
 void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaImage vmaImage) const
 {
     auto a = clock();
-    int x, y, cnls;
+
         vec_u8string_view fn=vec_u8string_view::initHelper({R"(tst.png)"});
+      std::filesystem::path path{fn.cbegin()};
+    
+   
         FILE *f = fopen64(fn.cbegin(), "rb");
 
         if(_mm_testc_si128(fn.getExtensionfromSubString(), png)) fmt::println("IS PNG Image!");
+
+
+
         fmt::print("Opened Image in : {}\n", clock() - a/CLOCKS_PER_SEC);
 
-        
+
+
+
+
+    int x, y, cnls;
     auto limg = tstA::loadImg(*f, x, y, cnls);
     // std::cout << sizeof(limg) <<"--"<< x <<"--"<< y <<"--"<< cnls << "\n";
     fmt::print("Loaded Image in : {}\n", clock() - a/CLOCKS_PER_SEC);

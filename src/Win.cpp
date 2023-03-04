@@ -1,6 +1,8 @@
 #include "Win.hpp"
+#include <bit>
 #include <cstdint>
 #include <cstdio>
+
 
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3.h>
@@ -13,6 +15,7 @@
 // using QWORD = uint64_t;
 
 extern  constinit const HINSTANCE   __ImageBase;
+const HINSTANCE hInst_  = std::bit_cast<HINSTANCE>(&__ImageBase);
 
 
 auto Win::nInit() -> HWND
@@ -22,7 +25,7 @@ auto Win::nInit() -> HWND
 
 auto Win::hInst() -> HINSTANCE
 {
-  return (__ImageBase);
+  return (hInst_);
 }
 
 auto Win::init() -> GLFWwindow*
@@ -59,8 +62,11 @@ if (!glfwInit())
     glfwWindowHint(GLFW_CONTEXT_CREATION_API , GLFW_NATIVE_CONTEXT_API);
     GLFWwindow* window = glfwCreateWindow(width, height, "My Title", NULL, NULL);
     
+    HMODULE hm;
+    GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, reinterpret_cast<LPCTSTR>( GetModuleHandle(NULL)), &hm), 
    printf("__ImageBase.ImageBase{} %llx\n", (&__ImageBase));
-  //  printf("__ImageBase.ImageBase{} %llx\n", (_hInst));
+   printf("__ImageBase.ImageBase{} %llx\n", (hInst_));
+   printf("__ImageBase.ImageBase{} %llx\n", (hm));
    printf("__ImageBase.ImageBase{} %llx\n", (GetModuleHandle(NULL)));
    printf("__ImageBase.ImageBase{} %llx\n", (inst));
   //  Win::min= glfwGetWin32Window(window);
