@@ -1,6 +1,9 @@
 #pragma once
 #define VULKAN_H_ 1
 
+#define _WINNT_
+#define _WINDOWS_
+
 #include <cstdint>
 #define _LIBCPP_CSTDINT
 #define _LIBCPP_STDINT_H
@@ -57,6 +60,9 @@ using VmaAllocation = struct VmaAllocation_T*;
     using LPARAM = long long;
     using LRESULT = long long;
     using UINT = unsigned int;
+    
+    
+    using WORD = unsigned short;
 
 
 // .Misc

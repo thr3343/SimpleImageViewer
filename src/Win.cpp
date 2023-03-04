@@ -4,18 +4,44 @@
 #include <cstdio>
 
 
+
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
 
+  
+enum {
+IMAGE_DOS_SIGNATURE = 0x5A4D
+};
 
+using IMAGE_DOS_HEADER = struct _IMAGE_DOS_HEADER {
+      WORD e_magic;
+      WORD e_cblp;
+      WORD e_cp;
+      WORD e_crlc;
+      WORD e_cparhdr;
+      WORD e_minalloc;
+      WORD e_maxalloc;
+      WORD e_ss;
+      WORD e_sp;
+      WORD e_csum;
+      WORD e_ip;
+      WORD e_cs;
+      WORD e_lfarlc;
+      WORD e_ovno;
+      WORD e_res[4];
+      WORD e_oemid;
+      WORD e_oeminfo;
+      WORD e_res2[10];
+      long e_lfanew;
+    };
 
 
 // using QWORD = uint64_t;
 
-extern  constinit const HINSTANCE   __ImageBase;
-const HINSTANCE hInst_  = std::bit_cast<HINSTANCE>(&__ImageBase);
+extern  constinit const IMAGE_DOS_HEADER   __ImageBase;
+const HINSTANCE _hInst  = std::bit_cast<HINSTANCE>(&__ImageBase);
 
 
 auto Win::nInit() -> HWND
@@ -25,7 +51,7 @@ auto Win::nInit() -> HWND
 
 auto Win::hInst() -> HINSTANCE
 {
-  return (hInst_);
+  return (_hInst);
 }
 
 auto Win::init() -> GLFWwindow*
@@ -62,12 +88,29 @@ if (!glfwInit())
     glfwWindowHint(GLFW_CONTEXT_CREATION_API , GLFW_NATIVE_CONTEXT_API);
     GLFWwindow* window = glfwCreateWindow(width, height, "My Title", NULL, NULL);
     
-    HMODULE hm;
-    GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, reinterpret_cast<LPCTSTR>( GetModuleHandle(NULL)), &hm), 
+    // HMODULE hm;
+    // GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, std::bit_cast<LPCTSTR>( GetModuleHandle(NULL)), &hm), 
+   
+   
+   printf("__ImageBase.e_magic{} %hx\n", (__ImageBase.e_magic));
+   printf("__ImageBase.e_cblp{} %hx\n", (__ImageBase.e_cblp));
+   printf("__ImageBase.e_minalloc{} %hx\n", (__ImageBase.e_minalloc));
+   printf("__ImageBase.e_maxalloc{} %hx\n", (__ImageBase.e_maxalloc));
+   
+   if(__ImageBase.e_magic!=IMAGE_DOS_SIGNATURE)
+  {
+      printf("\nError: Invalid executable image.\n");
+
+      // VirtualFree(_hInst,0,MEM_RELEASE);
+      exit(-1);
+  }
+   
+   
+   
    printf("__ImageBase.ImageBase{} %llx\n", (&__ImageBase));
-   printf("__ImageBase.ImageBase{} %llx\n", (hInst_));
-   printf("__ImageBase.ImageBase{} %llx\n", (hm));
-   printf("__ImageBase.ImageBase{} %llx\n", (GetModuleHandle(NULL)));
+   printf("__ImageBase.ImageBase{} %llx\n", (_hInst));
+  //  printf("__ImageBase.ImageBase{} %llx\n", (hm));
+  //  printf("__ImageBase.ImageBase{} %llx\n", (GetModuleHandle(NULL)));
    printf("__ImageBase.ImageBase{} %llx\n", (inst));
   //  Win::min= glfwGetWin32Window(window);
 
