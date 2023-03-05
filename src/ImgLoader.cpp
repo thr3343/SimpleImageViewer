@@ -173,44 +173,30 @@ void ImgLoader::transitionImageLayout( VkCommandBuffer commandBuffer, VkFormat f
   
   switch ( oldLayout+newLayout )
   {
-   
-    case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
-    {
-      barrier.dstAccessMask = ( VK_ACCESS_NONE );
-      barrier.dstAccessMask = ( VK_ACCESS_SHADER_READ_BIT );
-      sourceStage           = VK_PIPELINE_STAGE_TRANSFER_BIT;
-      destinationStage      = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
-      break;
-    }
+
+    case VK_IMAGE_LAYOUT_PREINITIALIZED+VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
     case VK_IMAGE_LAYOUT_UNDEFINED+VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
     {
-        barrier.srcAccessMask = VK_ACCESS_NONE;
-        barrier.dstAccessMask = ( VK_ACCESS_TRANSFER_READ_BIT );
-        sourceStage           = VK_PIPELINE_STAGE_NONE;
+        barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+        barrier.dstAccessMask = ( VK_ACCESS_TRANSFER_WRITE_BIT);
+        sourceStage           = VK_PIPELINE_STAGE_TRANSFER_BIT;
         destinationStage      = VK_PIPELINE_STAGE_TRANSFER_BIT;
         break;
     }
     case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL+VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
     {
-        barrier.srcAccessMask = VK_ACCESS_NONE;
-        barrier.dstAccessMask = ( VK_ACCESS_SHADER_READ_BIT );
-        sourceStage           = VK_PIPELINE_STAGE_NONE;
+        barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        barrier.dstAccessMask = ( VK_ACCESS_SHADER_WRITE_BIT);
+        sourceStage           = VK_PIPELINE_STAGE_TRANSFER_BIT;
         destinationStage      = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
         break;
     }
     case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL+VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:
     {
-        barrier.srcAccessMask = ( VK_ACCESS_NONE );
-        barrier.dstAccessMask = ( VK_ACCESS_NONE );
+        barrier.srcAccessMask = VK_ACCESS_NONE;
+        barrier.dstAccessMask = VK_ACCESS_NONE;
         sourceStage           = VK_PIPELINE_STAGE_NONE;
         destinationStage      = VK_PIPELINE_STAGE_NONE;
-        break;
-    }
-    case VK_IMAGE_LAYOUT_GENERAL:
-    {
-        barrier.dstAccessMask = ( VK_ACCESS_TRANSFER_WRITE_BIT);
-        sourceStage           = VK_PIPELINE_STAGE_TRANSFER_BIT;
-        destinationStage      = VK_PIPELINE_STAGE_TRANSFER_BIT;
         break;
     }
     default:  fmt::print( "Unsupported layout transition: {} {}", oldLayout, newLayout ), exit(1);

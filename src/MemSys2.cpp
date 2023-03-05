@@ -53,7 +53,7 @@ auto MemSys2::allocImg(VkExtent3D extent, uint32_t size, VkImageUsageFlags usage
     {
         .sType=VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
         .imageType=VK_IMAGE_TYPE_2D,
-        .format=VK_FORMAT_B8G8R8A8_UINT,
+        .format=VK_FORMAT_B8G8R8A8_SRGB,
         .extent=extent,
         .mipLevels=1,
         .arrayLayers=1,
