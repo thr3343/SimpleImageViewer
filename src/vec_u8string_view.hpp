@@ -30,7 +30,7 @@ VEC_CALL(__m128i) constexpr auto vmovdqu(auto P) noexcept
 */
 class [[gnu::aligned(m128Size)]] vec_u8string_view : public std::string_view 
 {
-    __v16qu _a=_mm_undefined_si128();
+   public: __v16qu _a=_mm_undefined_si128();
 
 
     constexpr explicit(true) vec_u8string_view(std::string_view sv, bool front=true) noexcept :
@@ -38,15 +38,15 @@ class [[gnu::aligned(m128Size)]] vec_u8string_view : public std::string_view
               std::string_view{front?sv.cbegin():sv.cend()-m128Size, m128Size}
               {};
 
-    public:
+    
     auto operator == (const vec_u8string_view & ext) const noexcept -> bool {return std::bit_cast<bool>(static_cast<bool>(_mm_testc_si128(this->_a, ext._a)));}
-    auto getExtensionfromSubString() -> __m128i;
+   [[nodiscard]] auto getExtensionfromSubString() const -> __m128i;
     auto stringToVecView(std::string_view) -> __v16qu;
-    static inline auto initHelper(std::string_view ext) -> vec_u8string_view;
+    static inline auto initHelper(auto ext) -> vec_u8string_view;
 };
 
 //Very ugly workaround to fix Character parsing Memory alignment issues if the length is greater than 32 Chars
-auto vec_u8string_view::initHelper(std::string_view ext) -> vec_u8string_view
+auto vec_u8string_view::initHelper(auto ext) -> vec_u8string_view
 {
-     return (ext.length()>32)? vec_u8string_view{ext, false}:vec_u8string_view{ext, true};
+     return vec_u8string_view{ext, !(ext.length()>32)};
 }

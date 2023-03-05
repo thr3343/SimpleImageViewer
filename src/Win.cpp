@@ -92,10 +92,11 @@ if (!glfwInit())
     // GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, std::bit_cast<LPCTSTR>( GetModuleHandle(NULL)), &hm), 
    
    
-   printf("__ImageBase.e_magic{} %hx\n", (__ImageBase.e_magic));
-   printf("__ImageBase.e_cblp{} %hx\n", (__ImageBase.e_cblp));
-   printf("__ImageBase.e_minalloc{} %hx\n", (__ImageBase.e_minalloc));
-   printf("__ImageBase.e_maxalloc{} %hx\n", (__ImageBase.e_maxalloc));
+  //  printf("__ImageBase.e_magic{} %hx\n", (__ImageBase.e_magic));
+  //  printf("__ImageBase.e_cblp{} %hx\n", (__ImageBase.e_cblp));
+  //  printf("__ImageBase.e_minalloc{} %hx\n", (__ImageBase.e_minalloc));
+  //  printf("__ImageBase.e_maxalloc{} %hx\n", (__ImageBase.e_maxalloc));
+  //  printf("__ImageBase.e_lfanew{} %hx\n", (__ImageBase.e_lfanew));
    
    if(__ImageBase.e_magic!=IMAGE_DOS_SIGNATURE)
   {

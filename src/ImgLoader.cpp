@@ -1,4 +1,6 @@
 #include "ImgLoader.hpp"
+#include <__fwd/string_view.h>
+#include <string_view>
 #include <vk_mem_alloc.h>
 #include "fmt/core.h"
 #include "imgLud.hpp"
@@ -80,6 +82,25 @@ vmaImage copyBuffer2Image(vmaImage &vkImage, VkCommSet commandBufferSets, vmaBuf
     return vkImage;
 }
 
+
+[[gnu::pure]] auto test( std::string ax="imgs/") noexcept
+{
+  
+      for (auto const& dir_entry : std::filesystem::directory_iterator{ax}->path()) 
+      {
+         
+        const auto a=dir_entry.string();
+         fmt::println("{}",a);
+          if(_mm_testc_si128(vec_u8string_view{a}.getExtensionfromSubString(),png)) 
+          {
+           
+            return std::string_view{ax.append(a)};
+        
+          }
+      }
+      return std::string_view{"Empty!"};
+}
+
 //TODO() Create Fake image to fill the Framebuffer>Swapchain Image if Dedocded/Decomrpessed bitMap s too small
 //or PRefill All SwpChain Images with a Def.Balck bakcground via Image Copy to SwapChain Dierctly overwirte any occluded Pixels
 
@@ -88,14 +109,15 @@ vmaImage copyBuffer2Image(vmaImage &vkImage, VkCommSet commandBufferSets, vmaBuf
 void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaImage vmaImage) const
 {
     auto a = clock();
+const auto ax{"imgs/"};
+        const vec_u8string_view fn{test()};
 
-        vec_u8string_view fn=vec_u8string_view::initHelper({R"(tst.png)"});
-      std::filesystem::path path{fn.cbegin()};
-    
-   
+        
+     
+        fmt::println("Loading: {}", fn.cbegin());
         FILE *f = fopen64(fn.cbegin(), "rb");
 
-        if(_mm_testc_si128(fn.getExtensionfromSubString(), png)) fmt::println("IS PNG Image!");
+        
 
 
 

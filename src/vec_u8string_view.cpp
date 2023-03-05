@@ -29,7 +29,7 @@ auto vec_u8string_view::stringToVecView(std::string_view string_view) -> __v16qu
 
 
 //use string_view to avoid unnessacery heap alloc
-auto vec_u8string_view::getExtensionfromSubString() -> __m128i
+auto vec_u8string_view::getExtensionfromSubString() const -> __m128i
 {
     const auto extOffset= _tzcnt_u64(_mm_movemask_epi8(_mm_cmpeq_epi8(_a,aDot))); //Extension Offset i.e. occurrance of "."
     
