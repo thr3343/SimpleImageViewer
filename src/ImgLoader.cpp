@@ -6,6 +6,7 @@
 #include "imgLud.hpp"
 #include "vec_u8string_view.hpp"
 #include <filesystem>
+#include <vulkan/vulkan_core.h>
 
 
 auto ImgLoader::genCommPool(uint32_t QueuefamilyIndex) const -> VkCommandPool
@@ -82,23 +83,21 @@ vmaImage copyBuffer2Image(vmaImage &vkImage, VkCommSet commandBufferSets, vmaBuf
     return vkImage;
 }
 
-
-[[gnu::pure]] auto test( std::string ax="imgs/") noexcept
+//This Function generates very ugly ASM (likely due to heap Allocations from std::string); May be worth optimising this later
+[[gnu::pure]] auto testDir(  std::string ax="imgs/") noexcept
 {
-  
+      const std::filesystem::path png{".png"};
       for (auto const& dir_entry : std::filesystem::directory_iterator{ax}->path()) 
       {
-         
-        const auto a=dir_entry.string();
-         fmt::println("{}",a);
-          if(_mm_testc_si128(vec_u8string_view{a}.getExtensionfromSubString(),png)) 
+       
+          if(dir_entry.extension()==png) 
           {
            
-            return std::string_view{ax.append(a)};
+            return std::string_view{ax.append(dir_entry.string())};
         
           }
       }
-      return std::string_view{"Empty!"};
+      return std::string_view{ax};
 }
 
 //TODO() Create Fake image to fill the Framebuffer>Swapchain Image if Dedocded/Decomrpessed bitMap s too small
@@ -109,13 +108,9 @@ vmaImage copyBuffer2Image(vmaImage &vkImage, VkCommSet commandBufferSets, vmaBuf
 void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaImage vmaImage) const
 {
     auto a = clock();
-const auto ax{"imgs/"};
-        const vec_u8string_view fn{test()};
 
-        
      
-        fmt::println("Loading: {}", fn.cbegin());
-        FILE *f = fopen64(fn.cbegin(), "rb");
+        FILE *f = fopen64(testDir().cbegin(), "rb");
 
         
 
@@ -161,7 +156,7 @@ const auto ax{"imgs/"};
 void ImgLoader::transitionImageLayout( VkCommandBuffer commandBuffer, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, VkImage const& image) const
 {
    
-  VkImageMemoryBarrier barrier = {
+  VkImageMemoryBarrier barrier{
     .sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
     .pNext               = VK_NULL_HANDLE,
     .oldLayout           = oldLayout,
@@ -169,88 +164,56 @@ void ImgLoader::transitionImageLayout( VkCommandBuffer commandBuffer, VkFormat f
     .srcQueueFamilyIndex = ( 0 ),
     .dstQueueFamilyIndex = ( 0 ),
     .image               = ( image ),
-    .subresourceRange    = { .aspectMask     = static_cast<VkImageAspectFlags>( ( format ) ),
-                             .baseMipLevel   = ( 0 ),
-                             .levelCount     = ( 1 ),
-                             .baseArrayLayer = ( 0 ),
-                             .layerCount     = ( 1 ) },
+    .subresourceRange    = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1}
+      
   };
-
-  if ( newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL )
-  {
-    if ( format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT )
-    {
-      barrier.subresourceRange.aspectMask = ( barrier.subresourceRange.aspectMask | VK_IMAGE_ASPECT_STENCIL_BIT );
-    }
-  }
 
   VkPipelineStageFlags sourceStage      = 0;
   VkPipelineStageFlags destinationStage = 0;
-  switch ( oldLayout )
+  
+  switch ( oldLayout+newLayout )
   {
-    case VK_IMAGE_LAYOUT_PREINITIALIZED: barrier.srcAccessMask = ( VK_ACCESS_MEMORY_READ_BIT ); break;
-    
-    case VK_IMAGE_LAYOUT_UNDEFINED: barrier.srcAccessMask = ( VK_ACCESS_SHADER_READ_BIT ); break;
-
-    case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL: barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT; break;
-    case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL: barrier.srcAccessMask = VK_ACCESS_NONE; break;
-
-    case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR: barrier.srcAccessMask = VK_ACCESS_NONE; break;
-    case VK_IMAGE_LAYOUT_GENERAL: barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT; break;
-
-    default:  fmt::print( "Unsupported layout transition" ), exit(1);
-  }
-
-  switch ( newLayout )
-  {
-    case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
-      {
-        barrier.subresourceRange.aspectMask = ( VK_IMAGE_ASPECT_DEPTH_BIT );
-        barrier.dstAccessMask = ( VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT );
-        sourceStage           = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-        destinationStage      = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
-        break;
-      }
+   
     case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
-      {
-        barrier.subresourceRange.aspectMask = ( VK_IMAGE_ASPECT_COLOR_BIT );
-        barrier.dstAccessMask = ( VK_ACCESS_SHADER_READ_BIT );
-        sourceStage           = VK_PIPELINE_STAGE_TRANSFER_BIT;
-        destinationStage      = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-        break;
-      }
-    case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
     {
-        barrier.subresourceRange.aspectMask = ( VK_IMAGE_ASPECT_COLOR_BIT );
+      barrier.dstAccessMask = ( VK_ACCESS_NONE );
+      barrier.dstAccessMask = ( VK_ACCESS_SHADER_READ_BIT );
+      sourceStage           = VK_PIPELINE_STAGE_TRANSFER_BIT;
+      destinationStage      = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+      break;
+    }
+    case VK_IMAGE_LAYOUT_UNDEFINED+VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+    {
+        barrier.srcAccessMask = VK_ACCESS_NONE;
         barrier.dstAccessMask = ( VK_ACCESS_TRANSFER_READ_BIT );
-        sourceStage           = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        sourceStage           = VK_PIPELINE_STAGE_NONE;
         destinationStage      = VK_PIPELINE_STAGE_TRANSFER_BIT;
         break;
     }
-    case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+    case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL+VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
     {
-        barrier.subresourceRange.aspectMask = ( VK_IMAGE_ASPECT_COLOR_BIT );
+        barrier.srcAccessMask = VK_ACCESS_NONE;
         barrier.dstAccessMask = ( VK_ACCESS_SHADER_READ_BIT );
-        sourceStage           = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+        sourceStage           = VK_PIPELINE_STAGE_NONE;
         destinationStage      = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
         break;
     }
-    case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:
+    case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL+VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:
     {
-        barrier.subresourceRange.aspectMask = ( VK_IMAGE_ASPECT_COLOR_BIT );
+        barrier.srcAccessMask = ( VK_ACCESS_NONE );
         barrier.dstAccessMask = ( VK_ACCESS_NONE );
         sourceStage           = VK_PIPELINE_STAGE_NONE;
         destinationStage      = VK_PIPELINE_STAGE_NONE;
         break;
-    }case VK_IMAGE_LAYOUT_GENERAL:
+    }
+    case VK_IMAGE_LAYOUT_GENERAL:
     {
-        barrier.subresourceRange.aspectMask = ( VK_IMAGE_ASPECT_COLOR_BIT );
         barrier.dstAccessMask = ( VK_ACCESS_TRANSFER_WRITE_BIT);
         sourceStage           = VK_PIPELINE_STAGE_TRANSFER_BIT;
         destinationStage      = VK_PIPELINE_STAGE_TRANSFER_BIT;
         break;
     }
-    default:  fmt::print( "Unsupported layout transition" ), exit(1);
+    default:  fmt::print( "Unsupported layout transition: {} {}", oldLayout, newLayout ), exit(1);
   }
 
   vkCmdPipelineBarrier( 
