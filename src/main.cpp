@@ -8,7 +8,7 @@
 #include "ComputePipeline.hpp"
 
 
-
+constexpr size_t sso_size = std::string{}.capacity();
 
 /*todo(thr3343): 
     Maybe Add Basic (Unit) Testing.....
@@ -45,7 +45,7 @@ auto main() -> int
     Maybe Add Basic (Unit) Testing.....
     *Directory recursion/Recursive Directory Walking...
 */
-   
+   fmt::println("sso_size{}", sso_size);
 
     computePipeline.BGR2RGBSwizzle(imgLoader, vkbase.PresentQueue.queue, swapChain.image);
     

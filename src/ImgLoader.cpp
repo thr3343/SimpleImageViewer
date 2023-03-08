@@ -84,7 +84,7 @@ vmaImage copyBuffer2Image(vmaImage &vkImage, VkCommSet commandBufferSets, vmaBuf
 }
 
 //This Function generates very ugly ASM (likely due to heap Allocations from std::string); May be worth optimising this later
-[[gnu::pure]] auto testDir(  std::string ax="imgs/") noexcept
+[[gnu::pure]] auto testDir(  std::string ax="imgs/") noexcept -> std::string_view
 {
       const std::filesystem::path png{".png"};
       for (auto const& dir_entry : std::filesystem::directory_iterator{ax}->path()) 
@@ -93,11 +93,11 @@ vmaImage copyBuffer2Image(vmaImage &vkImage, VkCommSet commandBufferSets, vmaBuf
           if(dir_entry.extension()==png) 
           {
            
-            return std::string_view{ax.append(dir_entry.string())};
+            return {ax.append(dir_entry.string())};
         
           }
       }
-      return std::string_view{ax};
+      return {"FAIL!"};
 }
 
 //TODO() Create Fake image to fill the Framebuffer>Swapchain Image if Dedocded/Decomrpessed bitMap s too small
@@ -109,8 +109,9 @@ void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaImage vma
 {
     auto a = clock();
 
-     
-        FILE *f = fopen64(testDir().cbegin(), "rb");
+     auto vav=testDir().cbegin();
+        fmt::print("Opening: {}\n", vav);
+        FILE *f = fopen64(vav, "rb");
 
         
 
