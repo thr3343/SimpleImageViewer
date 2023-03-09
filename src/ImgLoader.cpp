@@ -1,5 +1,6 @@
 #include "ImgLoader.hpp"
 #include <__fwd/string_view.h>
+#include <smmintrin.h>
 #include <string_view>
 #include <vk_mem_alloc.h>
 #include "fmt/core.h"
@@ -84,20 +85,20 @@ vmaImage copyBuffer2Image(vmaImage &vkImage, VkCommSet commandBufferSets, vmaBuf
 }
 
 //This Function generates very ugly ASM (likely due to heap Allocations from std::string); May be worth optimising this later
-[[gnu::pure]] auto testDir(  std::string ax="imgs/") noexcept -> std::string_view
+[[gnu::pure]] auto testDir(  std::string ax="imgs/") noexcept -> vec_u8string_view
 {
-      const std::filesystem::path png{".png"};
-      for (auto const& dir_entry : std::filesystem::directory_iterator{ax}->path()) 
+      // const std::filesystem::path png{".png"};
+      for (auto dir_entry : std::filesystem::directory_iterator{ax}) 
       {
-       
-          if(dir_entry.extension()==png) 
+          auto vavExt=vec_u8string_view::initHelper(std::string_view{dir_entry.path().generic_string()});
+          if(_mm_testc_si128(vavExt.getExtensionfromSubString(),png)) 
           {
            
-            return {ax.append(dir_entry.string())};
+            return {vavExt};
         
           }
       }
-      return {"FAIL!"};
+      return vec_u8string_view{std::string_view{"FAIL!"}};
 }
 
 //TODO() Create Fake image to fill the Framebuffer>Swapchain Image if Dedocded/Decomrpessed bitMap s too small
@@ -108,10 +109,12 @@ vmaImage copyBuffer2Image(vmaImage &vkImage, VkCommSet commandBufferSets, vmaBuf
 void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaImage vmaImage) const
 {
     auto a = clock();
-
-     auto vav=testDir().cbegin();
-        fmt::print("Opening: {}\n", vav);
-        FILE *f = fopen64(vav, "rb");
+    auto s=std::string_view{"imgs/tst.png"};
+     auto vav=vec_u8string_view::initHelper(s);
+     vav.delimAlign();
+     auto t=vav.begin();
+        fmt::print("Opening: {}\n", t.data());
+        FILE *f = fopen64(t.data(), "rb");
 
         
 
