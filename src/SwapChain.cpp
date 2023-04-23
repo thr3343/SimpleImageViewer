@@ -10,7 +10,7 @@
 auto SwapChain::getSwapChainImages(uint32_t size) -> std::array<VkImage, Frames>
 {
   fmt::print( "get SwapChain Images\n");
-  std::array<VkImage, Frames> image;
+
 constexpr uint32_t a = 2;
   VkImageCreateInfo VkImageCreateInfo{
     .sType=VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
@@ -28,10 +28,10 @@ constexpr uint32_t a = 2;
     .initialLayout=VK_IMAGE_LAYOUT_PREINITIALIZED
   };
   
-  vkCreateImage(tmpDevice_, &VkImageCreateInfo, nullptr, image.data());
+  vkCreateImage(tmpDevice_, &VkImageCreateInfo, nullptr, swapChainImages.data());
 
-  vkGetSwapchainImagesKHR( tmpDevice_, swapchain, &size, image.data());
-  return image;
+  vkGetSwapchainImagesKHR( tmpDevice_, swapchain, &size, swapChainImages.data());
+  return swapChainImages;
 }
 
 

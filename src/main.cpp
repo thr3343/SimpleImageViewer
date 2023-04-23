@@ -47,7 +47,7 @@ auto main() -> int
 */
    fmt::println("sso_size{}", sso_size);
 
-    computePipeline.BGR2RGBSwizzle(imgLoader, vkbase.PresentQueue.queue, swapChain.image);
+    computePipeline.BGR2RGBSwizzle(imgLoader, vkbase.PresentQueue.queue, swapChain.swapChainImages);
     
     while(!glfwWindowShouldClose(vkbase.window))
     {
@@ -84,22 +84,24 @@ auto main() -> int
 void renderer2::drawFrame() const noexcept
 {
 
-  chkTst(vkWaitForFences(vkbase.device, 1, &R2.fence2[currentFrame], false, -1));
+//   chkTst(vkWaitForFences(vkbase.device, 1, &R2.fence2[currentFrame], false, -1));
 
-  vkResetFences(vkbase.device, 1, &R2.fence2[currentFrame]);
+//   vkResetFences(vkbase.device, 1, &R2.fence2[currentFrame]);
   
   //TODO(thr3343): Replace fence Setup with Semaphore
-  chkTst(vkAcquireNextImageKHR( vkbase.device, swapChain.swapchain, -1, nullptr, fence2[renderer2::currentFrame], &imgIndx ));
+  chkTst(vkAcquireNextImageKHR( vkbase.device, swapChain.swapchain, 10000, FinishedSemaphore[imgIndx], nullptr, &imgIndx ));
   
 
       
-  constexpr VkPresentInfoKHR VkPresentInfoKHR1 alignas(32)
+  const VkPresentInfoKHR VkPresentInfoKHR1 alignas(32)
   { 
     .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
     .swapchainCount = 1,
     .pSwapchains    = &swapChain.swapchain,
     .pImageIndices  = (&imgIndx),
-    .pResults       = nullptr 
+    .pResults       = nullptr,
+    .waitSemaphoreCount=1,
+    .pWaitSemaphores=&FinishedSemaphore[imgIndx]
   };
 
 

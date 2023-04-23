@@ -21,13 +21,13 @@ struct SwapChain : Tmp
     SwapchainCapabilities extent;
     VkSwapchainKHR swapchain;
     VkPresentModeKHR presentMode;
-    std::array<VkImage, Frames> image;
+    std::array<VkImage, Frames> swapChainImages;
 
      explicit SwapChain(Tmp swap)
          :
            extent(handleSwapChainCapabilities()),
            swapchain(createSwapChain()),
-           image(getSwapChainImages(Frames)),
+           swapChainImages(getSwapChainImages(Frames)),
            SwapChain::Tmp(swap){}; // TODO(Vcmp): use Move Construction to avoid duplciating the handles: (Minor Mem Leak)
 
      auto handleSwapChainCapabilities() -> SwapchainCapabilities;

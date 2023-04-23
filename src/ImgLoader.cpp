@@ -1,6 +1,10 @@
 #include "ImgLoader.hpp"
 #include <__fwd/string_view.h>
+#include <array>
+#include <corecrt.h>
+#include <cstdint>
 #include <smmintrin.h>
+#include <string>
 #include <string_view>
 #include <vk_mem_alloc.h>
 #include "fmt/core.h"
@@ -83,22 +87,19 @@ vmaImage copyBuffer2Image(vmaImage &vkImage, VkCommSet commandBufferSets, vmaBuf
 
     return vkImage;
 }
-
+constexpr std::string_view fail = std::string_view{"FAIL!"};
 //This Function generates very ugly ASM (likely due to heap Allocations from std::string); May be worth optimising this later
-[[gnu::pure]] auto testDir(  std::string ax="imgs/") noexcept -> vec_u8string_view
+[[gnu::pure]] auto testDir(  std::string ax="imgs/") noexcept -> std::string_view
 {
       // const std::filesystem::path png{".png"};
-      for (auto dir_entry : std::filesystem::directory_iterator{ax}) 
+      for (const auto& dir_entry : std::filesystem::directory_iterator{ax}->path().filename()) 
       {
-          auto vavExt=vec_u8string_view::initHelper(std::string_view{dir_entry.path().generic_string()});
-          if(_mm_testc_si128(vavExt.getExtensionfromSubString(),png)) 
+          if(dir_entry.extension()==".png")
           {
-           
-            return {vavExt};
-        
+            return ax.append(dir_entry.string());
           }
       }
-      return vec_u8string_view{std::string_view{"FAIL!"}};
+      return fail;
 }
 
 //TODO() Create Fake image to fill the Framebuffer>Swapchain Image if Dedocded/Decomrpessed bitMap s too small
@@ -106,15 +107,24 @@ vmaImage copyBuffer2Image(vmaImage &vkImage, VkCommSet commandBufferSets, vmaBuf
 
 //?Esit* nto nessacery as an empty SwpChain>faremBuffer is Empty.black/Uninitialised Anyway, Only Scaling is needed/isues onyl occur is Resolution is Smaller than : may onyl be needed of a Custom>rpedefied/Effects Derived e.g. .msic.e,t.ce. .e bakcGround is Derived.used/Imepelemted.levarge.dieucaycdbfdu e.g.demfkd
 
+struct imgDetails
+{
+  uint16_t width, height;
+  uint8_t bitDepth;
+  VkFormat format;
+
+  vmaBuffer allocBuffer;
+
+};
+
+
 void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaImage vmaImage) const
 {
     auto a = clock();
-    auto s=std::string_view{"imgs/tst.png"};
-     auto vav=vec_u8string_view::initHelper(s);
-     vav.delimAlign();
-     auto t=vav.begin();
-        fmt::print("Opening: {}\n", t.data());
-        FILE *f = fopen64(t.data(), "rb");
+    auto imgDir=testDir();
+        fmt::print("Opening: {}\n", imgDir.data());
+        /* std::to_array("imgs/tst.png").data() */
+        FILE *f = fopen64(imgDir.data(), "rb");
 
         
 

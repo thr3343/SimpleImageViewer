@@ -26,6 +26,20 @@ struct  [[gnu::aligned(32)]] vmaBuffer
   void* aData;
 };
 
+struct defExtent2D
+{
+    uint16_t width, height;
+};
+ struct imageViewDetails
+ {
+    uint16_t width, height;
+    VkImage img;
+    VkFormat format;
+    VkImageUsageFlags usageFlags;
+    VkImageLayout current;
+    void addImg();
+
+ };
 struct [[gnu::aligned(32)]] vmaImage
 {
     VkImage img; 

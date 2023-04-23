@@ -25,16 +25,16 @@ struct [[clang::trivial_abi]] renderer2 : Tmp
   
 
 
-  std::array<VkSemaphore, Frames> AvailableSemaphore = doSet<VkSemaphore>(vkCreateCSemaphore, vkCreateSemaphore);
-  std::array<VkSemaphore, Frames> PresentSemaphore = doSet<VkSemaphore>(vkCreateCSemaphore, vkCreateSemaphore);
+  // std::array<VkSemaphore, Frames> AvailableSemaphore = doSet<VkSemaphore>(vkCreateCSemaphore, vkCreateSemaphore);
+  // std::array<VkSemaphore, Frames> PresentSemaphore = doSet<VkSemaphore>(vkCreateCSemaphore, vkCreateSemaphore);
   std::array<VkSemaphore, Frames> FinishedSemaphore = doSet<VkSemaphore>(vkCreateCSemaphore, vkCreateSemaphore);
-  std::array<VkFence, Frames> fence = doSet<VkFence>(vkFenceCreateInfo, vkCreateFence);
-  std::array<VkFence, Frames> fence2 = doSet<VkFence>(vkFenceCreateInfo, vkCreateFence);
+  // std::array<VkFence, Frames> fence = doSet<VkFence>(vkFenceCreateInfo, vkCreateFence);
+  // std::array<VkFence, Frames> fence2 = doSet<VkFence>(vkFenceCreateInfo, vkCreateFence);
 
   static constexpr const uint32_t                TmUt = 1000000000;
 
  
-} __attribute__((aligned(128)));
+} __attribute__((aligned(64)));
 
 template <typename type>
 constexpr auto renderer2::doSet( auto &s, auto f) -> std::array<type, Frames>
