@@ -23,23 +23,28 @@ auto Vkbase::getVer()  const noexcept -> uint32_t
 }  
 
     
-//Only the Compute queu is used currently as only the comoyute pipeline is needed atm.
+//Only the Compute queue is used currently as only the compute pipeline is needed atm.
 struct QueueFamilyVarients
 {
         uint32_t computePresentFamily;
 };
 
-
-auto determineQueueFamilies(VkPhysicalDevice physDevice) -> uint32_t
+auto getQueueFamilies(VkPhysicalDevice physDevice) -> std::vector<VkQueueFamilyProperties>
 {
         uint32_t famQueueCount;
         vkGetPhysicalDeviceQueueFamilyProperties(physDevice, &famQueueCount, nullptr);
         std::vector<VkQueueFamilyProperties> availableQueues(famQueueCount);
 
         vkGetPhysicalDeviceQueueFamilyProperties(physDevice, &famQueueCount, availableQueues.data());
+        return availableQueues;
+}
+
+auto determineQueueFamilies(VkPhysicalDevice physDevice) -> uint32_t
+{
         
+        const auto availableQueues=getQueueFamilies(physDevice);
         //Fallback if onyl one queue is available:
-        if(famQueueCount==1) return 0;
+        if(availableQueues.size()==1) return 0;
         uint32_t i;
         for(const auto& QueueInfo : availableQueues)
         {
@@ -115,13 +120,15 @@ auto Vkbase::createSurface()  -> VkSurfaceKHR
 {
       
     VkSurfaceKHR surface;
-    fmt::print( "Creating Surface\n");;
-  VkWin32SurfaceCreateInfoKHR createSurfaceInfo = {
-        .sType                       = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
-        .hwnd                        = hwnd,
-        .hinstance                   = inst,
-        .pNext                       = VK_NULL_HANDLE
-};
+
+  VkWin32SurfaceCreateInfoKHR createSurfaceInfo
+  {
+        VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
+        VK_NULL_HANDLE,
+        0,
+        inst,
+        hwnd,
+  };
   vkCreateWin32SurfaceKHR( instance, &createSurfaceInfo, nullptr, &surface);
   return surface;
 }

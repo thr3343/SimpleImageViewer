@@ -15,43 +15,12 @@ enum {
 IMAGE_DOS_SIGNATURE = 0x5A4D
 };
 
-using IMAGE_DOS_HEADER = struct _IMAGE_DOS_HEADER {
-      WORD e_magic;
-      WORD e_cblp;
-      WORD e_cp;
-      WORD e_crlc;
-      WORD e_cparhdr;
-      WORD e_minalloc;
-      WORD e_maxalloc;
-      WORD e_ss;
-      WORD e_sp;
-      WORD e_csum;
-      WORD e_ip;
-      WORD e_cs;
-      WORD e_lfarlc;
-      WORD e_ovno;
-      WORD e_res[4];
-      WORD e_oemid;
-      WORD e_oeminfo;
-      WORD e_res2[10];
-      long e_lfanew;
-    };
 
-
-// using QWORD = uint64_t;
-
-extern  constinit const IMAGE_DOS_HEADER   __ImageBase;
-const HINSTANCE _hInst  = std::bit_cast<HINSTANCE>(&__ImageBase);
 
 
 auto Win::nInit() -> HWND
 {
   return glfwGetWin32Window(window);
-}
-
-auto Win::hInst() -> HINSTANCE
-{
-  return (_hInst);
 }
 
 auto Win::init() -> GLFWwindow*
@@ -106,14 +75,6 @@ if (!glfwInit())
       exit(-1);
   }
    
-   
-   
-   printf("__ImageBase.ImageBase{} %llx\n", (&__ImageBase));
-   printf("__ImageBase.ImageBase{} %llx\n", (_hInst));
-  //  printf("__ImageBase.ImageBase{} %llx\n", (hm));
-  //  printf("__ImageBase.ImageBase{} %llx\n", (GetModuleHandle(NULL)));
-   printf("__ImageBase.ImageBase{} %llx\n", (inst));
-  //  Win::min= glfwGetWin32Window(window);
 
  
   printf("OK!\n");
