@@ -51,6 +51,8 @@ struct [[gnu::aligned(32)]] vmaImage
     VkFormat format;
     VkImageView view;
     void* aData;
+    void setCurrent(VkImageLayout lyut) noexcept { this->current=lyut; };
+
 };
 constexpr auto defres=VkExtent3D{width, height, 1};
 // /*fake enums:*/  using VkMemoryPropertyFlags = uint32_t;

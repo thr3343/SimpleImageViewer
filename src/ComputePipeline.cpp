@@ -127,14 +127,15 @@ void ComputePipeline::resizeThis(uint32_t size) noexcept
      
 }
 
-void ComputePipeline::BGR2RGBSwizzle(ImgLoader const &imgLoader, VkQueue queue, std::array<VkImage, Frames> image) noexcept
+//TODO(thr3343): Find a better way of handling.storing current imageLayputs in const member functions/PassThrough e.g.
+
+void ComputePipeline::BGR2RGBSwizzle(ImgLoader const &imgLoader, VkQueue queue, std::array<VkImage, Frames> image) const noexcept
 {
     commSet.beginSingleTimeCommands();
     imgLoader.loadImg(commSet, queue, compSSBO);
 
 
     imgLoader.transitionImageLayout(commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, compSSBO.img);
-    compSSBO.current=VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
  
     updateDescriptorSetArray();
 
@@ -160,7 +161,7 @@ void ComputePipeline::BGR2RGBSwizzle(ImgLoader const &imgLoader, VkQueue queue, 
     for(const VkImage &img : image) 
     {
         imgLoader.transitionImageLayout(commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_PREINITIALIZED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, img);
-        vkCmdCopyImage(commSet.commandBuffer, compSSBO.img, compSSBO.current, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
+        vkCmdCopyImage(commSet.commandBuffer, compSSBO.img, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, img, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferImageCopy);
         imgLoader.transitionImageLayout(commSet.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, img);
     }
     commSet.endSingleTimeCommands(queue, true, false);

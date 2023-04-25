@@ -38,8 +38,6 @@ auto SwapChain::getSwapChainImages(uint32_t size, uint32_t ActiveQueueFamily) ->
   auto SwapChain::createImageView(vmaImage image) const -> VkImageView
   {
     fmt::print( "Creating Image View\n");
-    // int i = 0;
-    // std::array<VkImageView, Frames> imageViews;
 
     VkImageSubresourceRange subresourceRange{  VK_IMAGE_ASPECT_COLOR_BIT,0,1,0,1};
     
@@ -202,8 +200,6 @@ auto SwapChain::createFramebuffers() -> VkFramebuffer
           .sType                   = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
           .pNext                   = &FramebufferAttachments,
           .flags                   = VK_FRAMEBUFFER_CREATE_IMAGELESS_BIT,
-          // .renderPass              = renderPass,
-          // .attachmentCount         = 1,
           .pAttachments            = nullptr,
           .width                   = width,
           .height                  = height,

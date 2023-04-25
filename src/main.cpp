@@ -22,10 +22,9 @@ namespace
     const Vkbase vkbase;
     const Tmp tmp{vkbase.instance, vkbase.device.device, vkbase.physDevice, vkbase.surface};
     const SwapChain swapChain{tmp, vkbase.device.computeQueue.queuefamilyVarient};
-    // const VkCommSet commSet{tmp, vkbase.TransferQueue.queuefamilyVarient};
     const MemSys2 memSys2{vkbase.vkVer, tmp, vkbase.device.computeQueue};
-     ComputePipeline computePipeline{memSys2, swapChain};
-   
+     
+    const ComputePipeline computePipeline{memSys2, swapChain};
     const ImgLoader imgLoader{vkbase.device.computeQueue, memSys2};
     const renderer2 R2{tmp};
    
@@ -41,10 +40,6 @@ uint32_t tmSecs;
 auto main() -> int
 {
 
-    /*todo(thr3343): 
-    Maybe Add Basic (Unit) Testing.....
-    *Directory recursion/Recursive Directory Walking...
-*/
    fmt::println("sso_size{}", sso_size);
 
     computePipeline.BGR2RGBSwizzle(imgLoader, vkbase.device.computeQueue.queue, swapChain.swapChainImages);
@@ -84,11 +79,6 @@ auto main() -> int
 void renderer2::drawFrame() const noexcept
 {
 
-//   chkTst(vkWaitForFences(vkbase.device, 1, &R2.fence2[currentFrame], false, -1));
-
-//   vkResetFences(vkbase.device, 1, &R2.fence2[currentFrame]);
-  
-  //TODO(thr3343): Replace fence Setup with Semaphore
   chkTst(vkAcquireNextImageKHR( vkbase.device.device, swapChain.swapchain, 10000, FinishedSemaphore[imgIndx], nullptr, &imgIndx ));
   
 

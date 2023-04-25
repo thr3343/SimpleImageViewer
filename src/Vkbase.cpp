@@ -170,93 +170,54 @@ for(VkPhysicalDevice physDevs : ppPhysicalDevicesdeviceCount)
  
 }
 
-uint32_t computeQueueFamily;
+
 // auto enumerateQueues() -> std::initializer_list<VkQueue>
 // {
         
 // }
 auto Vkbase::createDevice() -> GPUDevice
 {
- // fmt::print( "Creating Device\n");
-
-  //enumerateQueues();
 
   
-  computeQueueFamily = determineQueueFamilies(physDevice);
+        uint32_t computeQueueFamily = determineQueueFamilies(physDevice);
   
   
 
- constexpr float priority = 1.0f;
-//  const VkDeviceQueueCreateInfo deviceQueueCreateInfo 
-//  {
-//         VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-//         nullptr,
-//         0,
-//         0,
-//         1,
-//         &priority,
-//  };
-//  const VkDeviceQueueCreateInfo deviceQueueCreateInfo2 
-//  {
-//         VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-//         nullptr,
-//         0,
-//         1,
-//         1,
-//         &priority,
-//  }; 
- VkDeviceQueueCreateInfo deviceQueueCreateInfo3 
- {
-        VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-        nullptr,
-        0,
-        computeQueueFamily,
-        1,
-        &priority,
- };
- auto queueSetInitList ={deviceQueueCreateInfo3};
-  VkPhysicalDeviceVulkan13Features vk13F
-  {
-    .sType=VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
-    .pNext=nullptr,
-    .synchronization2=true,
-  };
-
-
-   VkPhysicalDeviceVulkan12Features deviceVulkan12Features = {
-    .sType                           = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
-    .pNext                           = &vk13F,
-    .descriptorBindingPartiallyBound = true,
-    .imagelessFramebuffer            = true,
-
-  };
-
+        constexpr float priority = 1.0f;
  
+        const VkDeviceQueueCreateInfo deviceQueueCreateInfo3 
+        {
+                VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+                nullptr,
+                0,
+                computeQueueFamily,
+                1,
+                &priority,
+        };
 
-  VkPhysicalDeviceFeatures2 deviceFeatures2 = { .sType    = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
-                                                .pNext    = &deviceVulkan12Features,
-                                                /* .features = deviceFeatures */ };
+
+        VkPhysicalDeviceVulkan12Features deviceVulkan12Features{};
+        VkPhysicalDeviceFeatures2 deviceFeatures2 = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &deviceVulkan12Features};
 
 
-  vkGetPhysicalDeviceFeatures2( physDevice, &deviceFeatures2 );
+        vkGetPhysicalDeviceFeatures2( physDevice, &deviceFeatures2 );
 
         constexpr auto * deviceExtensions = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
 
-        // constexpr uint32_t extCount= extensions.size();
-  const VkDeviceCreateInfo deviceCreateInfo 
-  {
-        .sType=VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-        .pNext=&deviceFeatures2,
-        // .flags=0,
-        .queueCreateInfoCount=1,
-        .pQueueCreateInfos=queueSetInitList.begin(),
-        // .enabledLayerCount=1,
-        .ppEnabledLayerNames= ENABLE_VALIDATION_LAYERS  ? &validationLayers : nullptr,
-        .enabledExtensionCount= 1,
-        .ppEnabledExtensionNames=&deviceExtensions,
-        .pEnabledFeatures= nullptr
+        const VkDeviceCreateInfo deviceCreateInfo 
+        {
+                .sType=VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+                .pNext=&deviceFeatures2,
+                // .flags=0,
+                .queueCreateInfoCount=1,
+                .pQueueCreateInfos=&deviceQueueCreateInfo3,
+                // .enabledLayerCount=1,
+                .ppEnabledLayerNames= ENABLE_VALIDATION_LAYERS  ? &validationLayers : nullptr,
+                .enabledExtensionCount= 1,
+                .ppEnabledExtensionNames=&deviceExtensions,
+                .pEnabledFeatures= nullptr
 
-  };
+        };
 
 
 
@@ -274,6 +235,6 @@ auto Vkbase::createDevice() -> GPUDevice
  {
         
         VkQueue GraphicsQueue;
-        vkGetDeviceQueue(device.device, computeQueueFamily, 0, &GraphicsQueue );
-        return {GraphicsQueue, computeQueueFamily};
+        vkGetDeviceQueue(device.device, QI, 0, &GraphicsQueue );
+        return {GraphicsQueue, QI};
  }

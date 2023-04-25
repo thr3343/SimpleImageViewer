@@ -103,10 +103,9 @@ constexpr std::string_view fail = std::string_view{"FAIL!"};
 }
 
 //TODO() Create Fake image to fill the Framebuffer>Swapchain Image if Dedocded/Decomrpessed bitMap s too small
-//or PRefill All SwpChain Images with a Def.Balck bakcground via Image Copy to SwapChain Dierctly overwirte any occluded Pixels
+//Or PRefill All SwapChain Images with a Def/Black background via Image Copy to SwapChain Directly overwrite any occluded Pixels
 
-//?Esit* nto nessacery as an empty SwpChain>faremBuffer is Empty.black/Uninitialised Anyway, Only Scaling is needed/isues onyl occur is Resolution is Smaller than : may onyl be needed of a Custom>rpedefied/Effects Derived e.g. .msic.e,t.ce. .e bakcGround is Derived.used/Imepelemted.levarge.dieucaycdbfdu e.g.demfkd
-
+//Edit: not nessacery as an empty SwapChain>frameBuffer is Empty/black/Uninitialised Anyway, Only Scaling is needed/isues only occur if Resolution is Smaller than the current vkImage/ViewPort
 struct imgDetails
 {
   uint16_t width, height;

@@ -32,10 +32,10 @@ struct SwapChain : Tmp
 
      auto handleSwapChainCapabilities() -> SwapchainCapabilities;
      auto createSwapChain(uint32_t) -> VkSwapchainKHR;
-     auto createRenderPass(VkImageLayout initial=VK_IMAGE_LAYOUT_UNDEFINED, bool load=false) -> VkRenderPass;
-     auto createFramebuffers() -> VkFramebuffer;
+     [[gnu::unused]] auto createRenderPass(VkImageLayout initial=VK_IMAGE_LAYOUT_UNDEFINED, bool load=false) -> VkRenderPass;
+     [[gnu::unused]] auto createFramebuffers() -> VkFramebuffer;
 
-     auto setupImageFormats() -> VkSurfaceFormatKHR;
+     [[gnu::unused]] auto setupImageFormats() -> VkSurfaceFormatKHR;
 
      [[nodiscard]] auto getSwapChainImages(uint32_t, uint32_t)
          -> std::array<VkImage, Frames>;

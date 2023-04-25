@@ -22,14 +22,9 @@ struct [[clang::trivial_abi]] renderer2 : Tmp
   static constinit inline uint8_t               currentFrame;
   
   template <typename type> constexpr auto doSet( auto &s, auto f) -> std::array<type, Frames>;
-  
 
-
-  // std::array<VkSemaphore, Frames> AvailableSemaphore = doSet<VkSemaphore>(vkCreateCSemaphore, vkCreateSemaphore);
-  // std::array<VkSemaphore, Frames> PresentSemaphore = doSet<VkSemaphore>(vkCreateCSemaphore, vkCreateSemaphore);
   std::array<VkSemaphore, Frames> FinishedSemaphore = doSet<VkSemaphore>(vkCreateCSemaphore, vkCreateSemaphore);
-  // std::array<VkFence, Frames> fence = doSet<VkFence>(vkFenceCreateInfo, vkCreateFence);
-  // std::array<VkFence, Frames> fence2 = doSet<VkFence>(vkFenceCreateInfo, vkCreateFence);
+ 
 
   static constexpr const uint32_t                TmUt = 1000000000;
 
