@@ -20,13 +20,13 @@ namespace
 {
 
     const Vkbase vkbase;
-    const Tmp tmp{vkbase.instance, vkbase.device, vkbase.physDevice, vkbase.surface};
-    const SwapChain swapChain{tmp};
+    const Tmp tmp{vkbase.instance, vkbase.device.device, vkbase.physDevice, vkbase.surface};
+    const SwapChain swapChain{tmp, vkbase.device.computeQueue.queuefamilyVarient};
     // const VkCommSet commSet{tmp, vkbase.TransferQueue.queuefamilyVarient};
-    const MemSys2 memSys2{vkbase.vkVer, tmp, vkbase.PresentQueue};
+    const MemSys2 memSys2{vkbase.vkVer, tmp, vkbase.device.computeQueue};
      ComputePipeline computePipeline{memSys2, swapChain};
    
-    const ImgLoader imgLoader{vkbase.PresentQueue, memSys2};
+    const ImgLoader imgLoader{vkbase.device.computeQueue, memSys2};
     const renderer2 R2{tmp};
    
 }  // namespace
@@ -47,7 +47,7 @@ auto main() -> int
 */
    fmt::println("sso_size{}", sso_size);
 
-    computePipeline.BGR2RGBSwizzle(imgLoader, vkbase.PresentQueue.queue, swapChain.swapChainImages);
+    computePipeline.BGR2RGBSwizzle(imgLoader, vkbase.device.computeQueue.queue, swapChain.swapChainImages);
     
     while(!glfwWindowShouldClose(vkbase.window))
     {
@@ -89,7 +89,7 @@ void renderer2::drawFrame() const noexcept
 //   vkResetFences(vkbase.device, 1, &R2.fence2[currentFrame]);
   
   //TODO(thr3343): Replace fence Setup with Semaphore
-  chkTst(vkAcquireNextImageKHR( vkbase.device, swapChain.swapchain, 10000, FinishedSemaphore[imgIndx], nullptr, &imgIndx ));
+  chkTst(vkAcquireNextImageKHR( vkbase.device.device, swapChain.swapchain, 10000, FinishedSemaphore[imgIndx], nullptr, &imgIndx ));
   
 
       
@@ -107,6 +107,6 @@ void renderer2::drawFrame() const noexcept
 
   currentFrame=++currentFrame%Frames;
 
-  chkTst(vkQueuePresentKHR( vkbase.PresentQueue.queue, &VkPresentInfoKHR1 ));
+  chkTst(vkQueuePresentKHR( vkbase.device.computeQueue.queue, &VkPresentInfoKHR1 ));
 
 }

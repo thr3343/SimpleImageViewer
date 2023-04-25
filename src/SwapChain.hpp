@@ -23,21 +23,21 @@ struct SwapChain : Tmp
     VkPresentModeKHR presentMode;
     std::array<VkImage, Frames> swapChainImages;
 
-     explicit SwapChain(Tmp swap)
+     explicit SwapChain(Tmp swap, uint32_t ActiveQueueFamily)
          :
            extent(handleSwapChainCapabilities()),
-           swapchain(createSwapChain()),
-           swapChainImages(getSwapChainImages(Frames)),
+           swapchain(createSwapChain(ActiveQueueFamily)),
+           swapChainImages(getSwapChainImages(Frames, ActiveQueueFamily)),
            SwapChain::Tmp(swap){}; // TODO(Vcmp): use Move Construction to avoid duplciating the handles: (Minor Mem Leak)
 
      auto handleSwapChainCapabilities() -> SwapchainCapabilities;
-     auto createSwapChain() -> VkSwapchainKHR;
+     auto createSwapChain(uint32_t) -> VkSwapchainKHR;
      auto createRenderPass(VkImageLayout initial=VK_IMAGE_LAYOUT_UNDEFINED, bool load=false) -> VkRenderPass;
      auto createFramebuffers() -> VkFramebuffer;
 
      auto setupImageFormats() -> VkSurfaceFormatKHR;
 
-     [[nodiscard]] auto getSwapChainImages(uint32_t)
+     [[nodiscard]] auto getSwapChainImages(uint32_t, uint32_t)
          -> std::array<VkImage, Frames>;
      [[nodiscard]] auto createImageViews(std::array<VkImage, Frames> image)
          -> std::array<VkImageView, Frames>;

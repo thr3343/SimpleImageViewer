@@ -4,7 +4,7 @@
 #include <cstdint>
 //#define VK_NO_PROTOTYPES
 
-struct [[gnu::aligned(16)]] DiscreteQueue 
+struct DiscreteQueue 
 {
 
   constexpr DiscreteQueue(VkQueue queue, uint32_t queuefamilyVarient)
@@ -22,6 +22,12 @@ struct [[gnu::aligned(16)]] DiscreteQueue
 };
 
 
+struct [[gnu::aligned(32)]] GPUDevice
+{
+  VkDevice device;
+  DiscreteQueue computeQueue;
+};
+
 struct Vkbase : Win
 {
 
@@ -35,16 +41,16 @@ struct Vkbase : Win
   VkInstance instance = createInstance();
   VkSurfaceKHR surface = createSurface();
   VkPhysicalDevice physDevice = createPhysDevice();
-  VkDevice device = createDevice();
+  GPUDevice device = createDevice();
+
   // DiscreteQueue GraphicsQueue = getQueue(0);
   // DiscreteQueue TransferQueue = getQueue(1);
-  DiscreteQueue PresentQueue = getQueue(2);
 
   [[nodiscard]] auto getVer()  const noexcept -> uint32_t;
   [[nodiscard]] auto createInstance() -> VkInstance;
   [[nodiscard]] auto createSurface() -> VkSurfaceKHR;
-  [[nodiscard]] auto createPhysDevice() -> VkPhysicalDevice;
-  [[nodiscard]] auto createDevice() -> VkDevice;
+  [[nodiscard]] auto createPhysDevice() -> VkPhysicalDevice; 
+  [[nodiscard]] auto createDevice() -> GPUDevice;
   [[nodiscard]] auto getQueue(uint32_t) -> DiscreteQueue;
 
   void clean();

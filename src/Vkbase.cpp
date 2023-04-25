@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <fmt/core.h>
 
+#include <vector>
 #include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_win32.h>
 
@@ -22,6 +23,44 @@ auto Vkbase::getVer()  const noexcept -> uint32_t
 }  
 
     
+//Only the Compute queu is used currently as only the comoyute pipeline is needed atm.
+struct QueueFamilyVarients
+{
+        uint32_t computePresentFamily;
+};
+
+
+auto determineQueueFamilies(VkPhysicalDevice physDevice) -> uint32_t
+{
+        uint32_t famQueueCount;
+        vkGetPhysicalDeviceQueueFamilyProperties(physDevice, &famQueueCount, nullptr);
+        std::vector<VkQueueFamilyProperties> availableQueues(famQueueCount);
+
+        vkGetPhysicalDeviceQueueFamilyProperties(physDevice, &famQueueCount, availableQueues.data());
+        
+        //Fallback if onyl one queue is available:
+        if(famQueueCount==1) return 0;
+        uint32_t i;
+        for(const auto& QueueInfo : availableQueues)
+        {
+                const bool hasCompute = (QueueInfo.queueFlags&VK_QUEUE_COMPUTE_BIT);
+                const bool hasGraphics = (QueueInfo.queueFlags&VK_QUEUE_GRAPHICS_BIT);
+                //Try to use the Dedicated Compute Queue if Available - Also Compute Support also (typically almost Always) implies Present Support as well, and therefore does not need to be explicitly checked
+                if(hasCompute&~hasGraphics)
+                {
+                        fmt::println("Using Queue Family: {}", i);
+                        return i;
+                }
+                i++;
+        }
+        fmt::println("Failed Queue Enumeration!");
+        exit(1);
+
+
+
+}
+
+
 
 
 
@@ -124,21 +163,19 @@ for(VkPhysicalDevice physDevs : ppPhysicalDevicesdeviceCount)
  
 }
 
-
+uint32_t computeQueueFamily;
 // auto enumerateQueues() -> std::initializer_list<VkQueue>
 // {
         
 // }
-auto Vkbase::createDevice() -> VkDevice
+auto Vkbase::createDevice() -> GPUDevice
 {
  // fmt::print( "Creating Device\n");
 
   //enumerateQueues();
 
   
-  uint32_t pQueueFamilyPropertyCount;
-  vkGetPhysicalDeviceQueueFamilyProperties( physDevice, &pQueueFamilyPropertyCount, VK_NULL_HANDLE );
-
+  computeQueueFamily = determineQueueFamilies(physDevice);
   
   
 
@@ -166,7 +203,7 @@ auto Vkbase::createDevice() -> VkDevice
         VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
         nullptr,
         0,
-        2,
+        computeQueueFamily,
         1,
         &priority,
  };
@@ -222,7 +259,7 @@ auto Vkbase::createDevice() -> VkDevice
   vkCreateDevice(physDevice, &deviceCreateInfo, nullptr, &device);
  
   
-  return device;
+  return {device, getQueue(computeQueueFamily)};
         
 }
 
@@ -230,6 +267,6 @@ auto Vkbase::createDevice() -> VkDevice
  {
         
         VkQueue GraphicsQueue;
-        vkGetDeviceQueue(device, QI, 0, &GraphicsQueue );
-        return {GraphicsQueue, QI};
+        vkGetDeviceQueue(device.device, computeQueueFamily, 0, &GraphicsQueue );
+        return {GraphicsQueue, computeQueueFamily};
  }

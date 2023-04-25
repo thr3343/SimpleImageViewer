@@ -7,11 +7,11 @@
 
 
 
-auto SwapChain::getSwapChainImages(uint32_t size) -> std::array<VkImage, Frames>
+auto SwapChain::getSwapChainImages(uint32_t size, uint32_t ActiveQueueFamily) -> std::array<VkImage, Frames>
 {
   fmt::print( "get SwapChain Images\n");
 
-constexpr uint32_t a = 2;
+
   VkImageCreateInfo VkImageCreateInfo{
     .sType=VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
     // .flags=VK_IMAGE_CREATE_EXTENDED_USAGE_BIT,
@@ -24,7 +24,7 @@ constexpr uint32_t a = 2;
     .tiling=VK_IMAGE_TILING_OPTIMAL,
     .usage=VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_STORAGE_BIT,
     .queueFamilyIndexCount=1,
-    .pQueueFamilyIndices=&a,
+    .pQueueFamilyIndices=&ActiveQueueFamily,
     .initialLayout=VK_IMAGE_LAYOUT_PREINITIALIZED
   };
   
@@ -137,11 +137,11 @@ auto SwapChain::setupImageFormats() -> VkSurfaceFormatKHR
     return swapChainImageFormat;
 }
 
-auto SwapChain::createSwapChain()->VkSwapchainKHR
+auto SwapChain::createSwapChain(uint32_t ActiveQueueFamily)->VkSwapchainKHR
 {
     fmt::print("ImageCount: {}\n", Frames);
     
-  constexpr uint32_t a = 2;
+
     const VkSwapchainCreateInfoKHR createInfo{
 
       .sType   = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
@@ -158,7 +158,7 @@ auto SwapChain::createSwapChain()->VkSwapchainKHR
 
       .imageSharingMode      = VK_SHARING_MODE_EXCLUSIVE, //Is concurrent even needed in many cases...
       .queueFamilyIndexCount = 1,
-      .pQueueFamilyIndices   = &a,
+      .pQueueFamilyIndices   = &ActiveQueueFamily,
       
 
       .preTransform   = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
