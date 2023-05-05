@@ -17,13 +17,16 @@ struct ComputePipeline : MemSys2
 {
     VkCommSet commSet;
     vmaImage compSSBO;
+    vmaImage compSSBODst;
     
     explicit ComputePipeline(MemSys2 const& Memsys, const SwapChain& swapChain) noexcept : 
             commSet{Memsys, Memsys.q.queuefamilyVarient}, 
             compSSBO(allocImg(defres, defSize, VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_TRANSFER_SRC_BIT|VK_IMAGE_USAGE_STORAGE_BIT)), 
+            compSSBODst(allocImg(defres, defSize, VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_TRANSFER_SRC_BIT|VK_IMAGE_USAGE_STORAGE_BIT)), 
             MemSys2{Memsys}
             { 
                 compSSBO.view=swapChain.createImageView(compSSBO);
+                compSSBODst.view=swapChain.createImageView(compSSBODst);
                 updateDescriptorSetArray(compSSBO.size);
             };
             
@@ -46,5 +49,5 @@ struct ComputePipeline : MemSys2
     void resizeThis(uint32_t=defSize) noexcept;
     void reLoad();
     
-    void BGR2RGBSwizzle(ImgLoader const&imgLoader, VkQueue queue, std::array<VkImage, Frames> image) const noexcept;
+    auto BGR2RGBSwizzle(ImgLoader const&imgLoader, VkQueue queue, std::array<VkImage, Frames> image, vmaImage src, vmaImage dst) const noexcept -> VkSemaphore;
 };

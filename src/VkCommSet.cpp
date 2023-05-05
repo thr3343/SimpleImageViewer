@@ -63,3 +63,20 @@ void VkCommSet::endSingleTimeCommands(VkQueue queue, bool submit, bool wait) con
   if(wait) (vkWaitForFences( tmpDevice_, 1, &fence, false, -1 ));
 //   vkResetCommandPool( device, ( commandPool2 ), VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT );
 }
+
+auto VkCommSet::endSingleTimeCommandsAlt(VkQueue queue, bool submit, bool wait) const -> VkSemaphore
+{
+  vkEndCommandBuffer( commandBuffer );
+
+    constexpr VkSemaphoreCreateInfo cs{VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
+  const auto sem=doPointerAlloc5<VkSemaphore>( &cs, vkCreateSemaphore);
+  const VkSubmitInfo       submitInfo1 = {
+          .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO, .pNext = VK_NULL_HANDLE, .commandBufferCount = ( 1 ), .pCommandBuffers = &commandBuffer,
+          .signalSemaphoreCount=1,
+          .pSignalSemaphores=&sem
+  };
+//   a = ( a ^ 1 );
+  vkQueueSubmit( queue, 1, &submitInfo1, !wait?VK_NULL_HANDLE:fence );
+  return sem;
+//   vkResetCommandPool( device, ( commandPool2 ), VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT );
+}

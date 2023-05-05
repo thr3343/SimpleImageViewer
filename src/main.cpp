@@ -36,14 +36,17 @@ uint32_t tmSecs;
    {
         return std::string_view{a.cend()-16, 16};
    }
-
+  std::array<VkSemaphore, Frames> FinishedSemaphore;
 auto main() -> int
 {
 
    fmt::println("sso_size{}", sso_size);
 
-    computePipeline.BGR2RGBSwizzle(imgLoader, vkbase.device.computeQueue.queue, swapChain.swapChainImages);
-    
+   VkSemaphore abs = computePipeline.BGR2RGBSwizzle(imgLoader, vkbase.device.computeQueue.queue, swapChain.swapChainImages, computePipeline.compSSBO, computePipeline.compSSBODst);
+    for(auto a =0;a<Frames;a++)
+    {
+        FinishedSemaphore[a]=abs;
+    }
     while(!glfwWindowShouldClose(vkbase.window))
     {
         

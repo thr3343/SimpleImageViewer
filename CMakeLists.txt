@@ -9,7 +9,7 @@ add_compile_definitions(SimpleImageViewer PRIVATE WIN32_LEAN_AND_MEAN VK_USE_PLA
 target_compile_features(SimpleImageViewer PRIVATE cxx_std_23)
 # target_compile_features(SimpleImageViewer PRIVATE c_std_23)
 # target_link_options(SimpleImageViewer PRIVATE -fsanitize=address,undefined)
-target_compile_options(SimpleImageViewer PRIVATE -march=native -mtune=native -save-temps -masm=intel -Ofast -fast -fno-char8_t -fno-exceptions -Wuninitialized -Weffc++)
+target_compile_options(SimpleImageViewer PRIVATE -march=native -mtune=native -save-temps -masm=intel -Ofast -fno-char8_t -fno-exceptions -Wuninitialized -Weffc++)
 
 	target_sources(SimpleImageViewer
 		PRIVATE
@@ -43,7 +43,7 @@ target_compile_options(SimpleImageViewer PRIVATE -march=native -mtune=native -sa
 	)
 	find_package(Vulkan REQUIRED)
 	
-	
+	  
 
 	# find_library(SPIRV STATIC "$ENV{VULKAN_SDK}/Lib/")
 	# find_library(glslang STATIC "$ENV{VULKAN_SDK}/Lib/")
@@ -51,7 +51,18 @@ target_compile_options(SimpleImageViewer PRIVATE -march=native -mtune=native -sa
 	
 	
 	target_sources(SimpleImageViewer PRIVATE FILE_SET HEADERS BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/stb" FILES "stb/stb_image.h")
+	target_include_directories(SimpleImageViewer PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/shaders")
 	
+	execute_process(
+		COMMAND glslc "${CMAKE_CURRENT_SOURCE_DIR}/shaders/Swizzle2.comp" -c  --target-env=vulkan1.3 -mfmt=num -O -o -
+		WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/shaders/"
+		OUTPUT_VARIABLE w
+		RESULT_VARIABLE w1
+	)
+
+
+	string(CONFIGURE "#include <cstdint>\n#include <array>\nconstexpr auto Swizzle2= std::to_array<uint32_t>({ ${w} })\;" w)
+	file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/src/Swizzle.inl" ${w})
 	
 	target_precompile_headers(SimpleImageViewer 
 		PRIVATE 

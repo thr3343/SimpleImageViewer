@@ -23,7 +23,7 @@ struct [[clang::trivial_abi]] renderer2 : Tmp
   
   template <typename type> constexpr auto doSet( auto &s, auto f) -> std::array<type, Frames>;
 
-  std::array<VkSemaphore, Frames> FinishedSemaphore = doSet<VkSemaphore>(vkCreateCSemaphore, vkCreateSemaphore);
+
  
 
   static constexpr const uint32_t                TmUt = 1000000000;

@@ -14,5 +14,6 @@ struct VkCommSet:Tmp
      explicit VkCommSet(Tmp tmp, uint32_t i=2): commandPool(genCommPool(i)),commandBuffer(doGenCommnd(commandPool)), Tmp{tmp} {};
     void beginSingleTimeCommands() const;
     void endSingleTimeCommands(VkQueue queue, bool submit=true, bool wait=false) const;
+    auto endSingleTimeCommandsAlt(VkQueue queue, bool submit=true, bool wait=false) const -> VkSemaphore;
     [[nodiscard]] auto setupFence() const noexcept -> VkFence;
 };

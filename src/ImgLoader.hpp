@@ -21,7 +21,7 @@ struct ImgLoader:MemSys2
     [[nodiscard]] auto genCommPool(uint32_t) const -> VkCommandPool;
 
     void loadImg(VkCommSet, VkQueue, vmaImage) const;
-    void transitionImageLayout( VkCommandBuffer commandBuffer, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, VkImage const& image) const;
+    void transitionImageLayout( VkCommandBuffer commandBuffer, VkImageLayout newLayout, vmaImage const& image) const;
     void copyImage2Image(vmaImage vkImage, VkCommandBuffer commandBufferSets, VkImage stagingBuffer) const;
 
    [[gnu::cold]] ~ImgLoader()

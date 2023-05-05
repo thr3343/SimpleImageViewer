@@ -25,7 +25,7 @@ auto SwapChain::getSwapChainImages(uint32_t size, uint32_t ActiveQueueFamily) ->
     .usage=VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_STORAGE_BIT,
     .queueFamilyIndexCount=1,
     .pQueueFamilyIndices=&ActiveQueueFamily,
-    .initialLayout=VK_IMAGE_LAYOUT_PREINITIALIZED
+    .initialLayout=VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
   };
   
   vkCreateImage(tmpDevice_, &VkImageCreateInfo, nullptr, swapChainImages.data());

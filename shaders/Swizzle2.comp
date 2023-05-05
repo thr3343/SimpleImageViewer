@@ -4,13 +4,13 @@
 layout (local_size_x = 32, local_size_y = 32) in;
 
 
-layout(binding = 0, rgba8ui) uniform restrict uimage2D Img;
+layout(binding = 0, rgba8ui) uniform restrict readonly uimage2D Src;
+layout(binding = 1, rgba8ui) uniform restrict writeonly uimage2D Dst;
 
 
 void main()
 {
 	const uint xx = (gl_GlobalInvocationID.x);
 	const uint yy = (gl_GlobalInvocationID.y);
-	
-	imageStore(Img, ivec2(xx, yy), imageLoad(Img, ivec2(xx, yy)).bgra);
+	imageStore(Dst, ivec2(xx, yy), imageLoad(Src, ivec2(xx, yy)).bgra);
 }

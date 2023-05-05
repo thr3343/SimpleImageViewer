@@ -43,29 +43,29 @@ auto ImgLoader::doGenCommnd(uint32_t count, VkCommandPool commandPool) const -> 
   return PreTestBuffer;
 }
 
-void ImgLoader::copyImage2Image(vmaImage vkImage, VkCommandBuffer commandBufferSets, VkImage stagingBuffer) const
-{
-    constexpr VkImageCopy copyRegion
-    {
-      .srcSubresource=subresource,
-      .srcOffset=VkOffset3D{},
-      .dstSubresource=subresource,
-	    .dstOffset=VkOffset3D{},
-      .extent=defres
-    };
+// void ImgLoader::copyImage2Image(vmaImage vkImage, VkCommandBuffer commandBufferSets, VkImage stagingBuffer) const
+// {
+//     constexpr VkImageCopy copyRegion
+//     {
+//       .srcSubresource=subresource,
+//       .srcOffset=VkOffset3D{},
+//       .dstSubresource=subresource,
+// 	    .dstOffset=VkOffset3D{},
+//       .extent=defres
+//     };
     
 
-	//copy the buffer into the image
-    constexpr VkCommandBufferBeginInfo beginInfo1 = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-                                                    .flags = ( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT) };
-  vkBeginCommandBuffer(commandBufferSets, &beginInfo1);
-  {
-    transitionImageLayout(commandBufferSets, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, stagingBuffer);
-    vkCmdCopyImage(commandBufferSets, vkImage.img, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, stagingBuffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
-    transitionImageLayout(commandBufferSets, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, stagingBuffer);
-  }
-  vkEndCommandBuffer( commandBufferSets );
-}
+// 	//copy the buffer into the image
+//     constexpr VkCommandBufferBeginInfo beginInfo1 = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+//                                                     .flags = ( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT) };
+//   vkBeginCommandBuffer(commandBufferSets, &beginInfo1);
+//   {
+//     transitionImageLayout(commandBufferSets, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, stagingBuffer);
+//     vkCmdCopyImage(commandBufferSets, vkImage.img, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, stagingBuffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+//     transitionImageLayout(commandBufferSets, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, stagingBuffer);
+//   }
+//   vkEndCommandBuffer( commandBufferSets );
+// }
 
 
 vmaImage copyBuffer2Image(vmaImage &vkImage, VkCommSet commandBufferSets, vmaBuffer stagingBuffer, VkQueue queue)
@@ -159,24 +159,24 @@ void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaImage vma
         fmt::print("Copied Image in : {}\n", clock() - a/CLOCKS_PER_SEC);
 
 
-    transitionImageLayout(commandBufferSets.commandBuffer, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, vmaImage.img);
+    transitionImageLayout(commandBufferSets.commandBuffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, vmaImage);
     vmaImage.current=VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
     copyBuffer2Image(vmaImage, commandBufferSets, stagingBuffer, queue);
    
 
 }
 
-void ImgLoader::transitionImageLayout( VkCommandBuffer commandBuffer, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, VkImage const& image) const
+void ImgLoader::transitionImageLayout( VkCommandBuffer commandBuffer, VkImageLayout newLayout, vmaImage const&image) const
 {
-   
+  const VkImageLayout oldLayout = image.current;
   VkImageMemoryBarrier barrier{
     .sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
     .pNext               = VK_NULL_HANDLE,
     .oldLayout           = oldLayout,
     .newLayout           = ( newLayout ),
-    .srcQueueFamilyIndex = ( 0 ),
-    .dstQueueFamilyIndex = ( 0 ),
-    .image               = ( image ),
+    .srcQueueFamilyIndex = ( 2 ),
+    .dstQueueFamilyIndex = ( 2 ),
+    .image               = ( image.img ),
     .subresourceRange    = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1}
       
   };
@@ -195,6 +195,14 @@ void ImgLoader::transitionImageLayout( VkCommandBuffer commandBuffer, VkFormat f
         sourceStage           = VK_PIPELINE_STAGE_TRANSFER_BIT;
         destinationStage      = VK_PIPELINE_STAGE_TRANSFER_BIT;
         break;
+    } 
+    case VK_IMAGE_LAYOUT_UNDEFINED+VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+    {
+        barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        barrier.dstAccessMask = ( VK_ACCESS_TRANSFER_READ_BIT);
+        sourceStage           = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        destinationStage      = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        break;
     }
     case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL+VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
     {
@@ -208,8 +216,8 @@ void ImgLoader::transitionImageLayout( VkCommandBuffer commandBuffer, VkFormat f
     {
         barrier.srcAccessMask = VK_ACCESS_NONE;
         barrier.dstAccessMask = VK_ACCESS_NONE;
-        sourceStage           = VK_PIPELINE_STAGE_NONE;
-        destinationStage      = VK_PIPELINE_STAGE_NONE;
+        sourceStage           = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        destinationStage      = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
         break;
     }
     default:  fmt::print( "Unsupported layout transition: {} {}", oldLayout, newLayout ), exit(1);
