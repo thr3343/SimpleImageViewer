@@ -99,7 +99,7 @@ auto enumBindings(auto strct)
 
     VkDescriptorSet pDescriptorSet;
 
-    vkAllocateDescriptorSets(tmpDevice_, &allocInfo, &pDescriptorSet);
+    vkAllocateDescriptorSets(device, &allocInfo, &pDescriptorSet);
 
 
     return pDescriptorSet;
@@ -118,7 +118,7 @@ void ComputePipeline::updateDescriptorSetArray(uint32_t size) const noexcept
 
 
 
-    auto  ssboDescriptorWrites = std::to_array<VkWriteDescriptorSet>({VkWriteDescriptorSet{
+    auto  ssboDescriptorWrites = std::to_array<VkWriteDescriptorSet>({{
         .sType=VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
         .dstSet=compDescriptorSet,
         .dstBinding=0,
@@ -126,7 +126,7 @@ void ComputePipeline::updateDescriptorSetArray(uint32_t size) const noexcept
         .descriptorCount=1,
         .descriptorType=descriptorVarient,
         .pImageInfo=&x[0],
-    },VkWriteDescriptorSet{
+    },{
         .sType=VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
         .dstSet=compDescriptorSet,
         .dstBinding=1,
@@ -142,19 +142,19 @@ void ComputePipeline::updateDescriptorSetArray(uint32_t size) const noexcept
 
 
 
-    vkUpdateDescriptorSets(tmpDevice_, numImgs, ssboDescriptorWrites.data(), 0, nullptr);
+    vkUpdateDescriptorSets(device, numImgs, ssboDescriptorWrites.data(), 0, nullptr);
 }
 void ComputePipeline::resizeThis(uint32_t size) noexcept
 {       
     vmaUnmapMemory(a, compSSBO.alloc);
     vmaDestroyImage(a, compSSBO.img, compSSBO.alloc);
-    compSSBO = allocImg(defres,defSize,compSSBO.usageFlags, compSSBO.view);
+    compSSBO = allocImg(compSSBO.extent,compSSBO.format,compSSBO.usageFlags, compSSBO.view);
     updateDescriptorSetArray(size);
     vmaMapMemory(a, compSSBO.alloc, &data);
     
     vmaUnmapMemory(a, compSSBODst.alloc);
     vmaDestroyImage(a, compSSBODst.img, compSSBODst.alloc);
-    compSSBODst = allocImg(defres,defSize,compSSBODst.usageFlags, compSSBODst.view);
+    compSSBODst = allocImg(compSSBODst.extent,compSSBODst.format,compSSBODst.usageFlags, compSSBODst.view);
     updateDescriptorSetArray(size);
     vmaMapMemory(a, compSSBODst.alloc, &data);
      
@@ -171,7 +171,7 @@ auto ComputePipeline::BGR2RGBSwizzle(ImgLoader const &imgLoader, VkQueue queue, 
     // imgLoader.transitionImageLayout(commSet.commandBuffer, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, compSSBO);
     imgLoader.transitionImageLayout(commSet.commandBuffer, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, compSSBODst);
  
-    updateDescriptorSetArray();
+    updateDescriptorSetArray(compSSBO.size);
 
     vkCmdBindPipeline(commSet.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, compPipeline);
     vkCmdBindDescriptorSets(commSet.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, compPipelineLayout, 0, 1, &compDescriptorSet, 0, nullptr);
@@ -255,6 +255,6 @@ vkCmdPipelineBarrier(
     };
 
     VkPipeline compPipeLine;
-    vkCreateComputePipelines(tmpDevice_, nullptr, 1, &ComputePipelineCreateInfo, nullptr, &compPipeLine);
+    vkCreateComputePipelines(device, nullptr, 1, &ComputePipelineCreateInfo, nullptr, &compPipeLine);
     return compPipeLine;
 }

@@ -1,4 +1,5 @@
 #include <GLFW/glfw3.h>
+
 #include "Vkbase.hpp"
 #include "SwapChain.hpp"
 #include "MemSys2.hpp"
@@ -14,19 +15,25 @@ constexpr size_t sso_size = std::string{}.capacity();
     Maybe Add Basic (Unit) Testing.....
     *Directory recursion/Recursive Directory Walking...
 */
-
-
+template<typename type>
+[[gnu::const]]  auto fillSet(VkSemaphore a) noexcept -> std::array<type, Frames>
+{
+    std::array<type, Frames> aa;
+    aa.fill(a);
+    return aa;
+}
 namespace
 {
 
-    const Vkbase vkbase;
-    const Tmp tmp{vkbase.instance, vkbase.device.device, vkbase.physDevice, vkbase.surface};
-    const SwapChain swapChain{tmp, vkbase.device.computeQueue.queuefamilyVarient};
-    const MemSys2 memSys2{vkbase.vkVer, tmp, vkbase.device.computeQueue};
+    const GPUDevice device = createDevice();
+
+    const SwapChain swapChain{device, device.computeQueue.queuefamilyVarient};
+    const MemSys2 memSys2{vkVer, device, device.computeQueue};
      
     const ComputePipeline computePipeline{memSys2, swapChain};
-    const ImgLoader imgLoader{vkbase.device.computeQueue, memSys2};
-    const renderer2 R2{tmp};
+    const ImgLoader imgLoader{device.computeQueue, memSys2};
+    const renderer2 R2{};
+    const std::array<VkSemaphore, Frames> FinishedSemaphore=fillSet<VkSemaphore>(computePipeline.BGR2RGBSwizzle(imgLoader, device.computeQueue.queue, swapChain.swapChainImages, computePipeline.compSSBO, computePipeline.compSSBODst));
    
 }  // namespace
 uint32_t i;
@@ -36,18 +43,13 @@ uint32_t tmSecs;
    {
         return std::string_view{a.cend()-16, 16};
    }
-  std::array<VkSemaphore, Frames> FinishedSemaphore;
 auto main() -> int
 {
 
    fmt::println("sso_size{}", sso_size);
 
-   VkSemaphore abs = computePipeline.BGR2RGBSwizzle(imgLoader, vkbase.device.computeQueue.queue, swapChain.swapChainImages, computePipeline.compSSBO, computePipeline.compSSBODst);
-    for(auto a =0;a<Frames;a++)
-    {
-        FinishedSemaphore[a]=abs;
-    }
-    while(!glfwWindowShouldClose(vkbase.window))
+   
+    while(!glfwWindowShouldClose(swapChain.window))
     {
         
         static constinit DWORD prevTime;
@@ -74,15 +76,14 @@ auto main() -> int
     }
 
     fmt::print("No Window! \n");
-    glfwDestroyWindow(vkbase.window);
+    glfwDestroyWindow(swapChain.window);
     swapChain.~SwapChain();
-    vkbase.~Vkbase();
 }
 
 void renderer2::drawFrame() const noexcept
 {
 
-  chkTst(vkAcquireNextImageKHR( vkbase.device.device, swapChain.swapchain, 10000, FinishedSemaphore[imgIndx], nullptr, &imgIndx ));
+  chkTst(vkAcquireNextImageKHR( device.device, swapChain.swapchain, 10000, FinishedSemaphore[imgIndx], nullptr, &imgIndx ));
   
 
       
@@ -100,6 +101,6 @@ void renderer2::drawFrame() const noexcept
 
   currentFrame=++currentFrame%Frames;
 
-  chkTst(vkQueuePresentKHR( vkbase.device.computeQueue.queue, &VkPresentInfoKHR1 ));
+  chkTst(vkQueuePresentKHR( device.computeQueue.queue, &VkPresentInfoKHR1 ));
 
 }

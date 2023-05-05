@@ -39,7 +39,7 @@ auto ImgLoader::doGenCommnd(uint32_t count, VkCommandPool commandPool) const -> 
                                                   .commandBufferCount = count};
   fmt::print("{} {}\n", allocateInfo.commandBufferCount, "Command Buffers");
   
-  chkTst(vkAllocateCommandBuffers(tmpDevice_, &allocateInfo, PreTestBuffer.data() ));
+  chkTst(vkAllocateCommandBuffers(device, &allocateInfo, PreTestBuffer.data() ));
   return PreTestBuffer;
 }
 

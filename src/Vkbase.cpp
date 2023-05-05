@@ -15,8 +15,9 @@ constexpr auto extensions       = std::to_array({ VK_KHR_SURFACE_EXTENSION_NAME,
 
 constexpr auto valdFeatures     = std::to_array({ VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT, VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT});
 
-auto Vkbase::getVer()  const noexcept -> uint32_t
+[[nodiscard, gnu::const]] auto getVer()  noexcept -> uint32_t
 {
+        fmt::println("Get vkVer!");
         uint32_t a;
         vkEnumerateInstanceVersion(&a);
         return a;
@@ -69,9 +70,12 @@ auto determineQueueFamilies(VkPhysicalDevice physDevice) -> uint32_t
 
 
 
-auto Vkbase::createInstance() -> VkInstance
+auto createInstance() -> VkInstance
 {
-        
+        fmt::println("Create Instance!");
+             uint32_t vkVer;
+        vkEnumerateInstanceVersion(&vkVer);
+    
 
         constexpr VkValidationFeaturesEXT  extValidationFeatures
         {
@@ -115,31 +119,7 @@ auto Vkbase::createInstance() -> VkInstance
 
         return vki;
 }
-
-auto Vkbase::createSurface()  -> VkSurfaceKHR
-{
-      
-    VkSurfaceKHR surface;
-
-  VkWin32SurfaceCreateInfoKHR createSurfaceInfo
-  {
-        VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
-        VK_NULL_HANDLE,
-        0,
-        inst,
-        hwnd,
-  };
-  vkCreateWin32SurfaceKHR( instance, &createSurfaceInfo, nullptr, &surface);
-  return surface;
-}
-
-
-void Vkbase::clean()
-{
-        fmt::print("Clean!\n");
-        vkDestroySurfaceKHR(instance, surface, nullptr);
-        vkDestroyInstance(instance, nullptr);
-}
+const VkInstance instance = createInstance();
 
 auto getPhyDevProps(VkPhysicalDevice physDevice) -> VkPhysicalDeviceProperties
 {
@@ -150,7 +130,7 @@ auto getPhyDevProps(VkPhysicalDevice physDevice) -> VkPhysicalDeviceProperties
 
 
 
-auto Vkbase::createPhysDevice() -> VkPhysicalDevice
+auto createPhysDevice() -> VkPhysicalDevice
 {
   fmt::print( "Picking Physical Device\n");
    uint32_t deviceCount;
@@ -175,11 +155,12 @@ for(VkPhysicalDevice physDevs : ppPhysicalDevicesdeviceCount)
 // {
         
 // }
-auto Vkbase::createDevice() -> GPUDevice
+auto createDevice() -> GPUDevice
 {
+        fmt::println("Creating GPUDevice!");
 
-  
-        uint32_t computeQueueFamily = determineQueueFamilies(physDevice);
+  const auto physDevice=createPhysDevice();
+       const uint32_t computeQueueFamily = determineQueueFamilies(physDevice);
   
   
 
@@ -226,15 +207,19 @@ auto Vkbase::createDevice() -> GPUDevice
 
   vkCreateDevice(physDevice, &deviceCreateInfo, nullptr, &device);
  
-  
-  return {device, getQueue(computeQueueFamily)};
+    VkQueue GraphicsQueue;
+        vkGetDeviceQueue(device, computeQueueFamily, 0, &GraphicsQueue );
+       
+
+
+  return {device, {GraphicsQueue, computeQueueFamily}, instance, physDevice};
         
 }
 
- auto Vkbase::getQueue(uint32_t QI) -> DiscreteQueue
+/*  auto Vkbase::getQueue(uint32_t QI) -> DiscreteQueue
  {
         
         VkQueue GraphicsQueue;
         vkGetDeviceQueue(device.device, QI, 0, &GraphicsQueue );
         return {GraphicsQueue, QI};
- }
+ } */

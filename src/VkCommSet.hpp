@@ -1,9 +1,9 @@
 #pragma once
 #include "defs.tpp"
-#include "TMp.hpp"
+#include "Vkbase.hpp"
 #include <cstdint>
 
-struct VkCommSet:Tmp
+struct VkCommSet:GPUDevice
 {
     VkCommandPool commandPool;
     VkCommandBuffer commandBuffer;
@@ -11,7 +11,7 @@ struct VkCommSet:Tmp
 
     VkCommandPool genCommPool(uint32_t);
     VkCommandBuffer doGenCommnd(VkCommandPool);
-     explicit VkCommSet(Tmp tmp, uint32_t i=2): commandPool(genCommPool(i)),commandBuffer(doGenCommnd(commandPool)), Tmp{tmp} {};
+     explicit VkCommSet(GPUDevice tmp, uint32_t i=2): commandPool(genCommPool(i)),commandBuffer(doGenCommnd(commandPool)), GPUDevice{tmp} {};
     void beginSingleTimeCommands() const;
     void endSingleTimeCommands(VkQueue queue, bool submit=true, bool wait=false) const;
     auto endSingleTimeCommandsAlt(VkQueue queue, bool submit=true, bool wait=false) const -> VkSemaphore;

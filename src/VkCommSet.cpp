@@ -34,7 +34,7 @@ VkCommandBuffer VkCommSet::doGenCommnd(VkCommandPool commandPool)
                                                   .level              =  VK_COMMAND_BUFFER_LEVEL_PRIMARY ,
                                                   .commandBufferCount = 1};
 
-  vkAllocateCommandBuffers(tmpDevice_, &allocateInfo, &PreTestBuffer );
+  vkAllocateCommandBuffers(device, &allocateInfo, &PreTestBuffer );
 
   return PreTestBuffer;
 }
@@ -60,7 +60,7 @@ void VkCommSet::endSingleTimeCommands(VkQueue queue, bool submit, bool wait) con
   };
 //   a = ( a ^ 1 );
   vkQueueSubmit( queue, 1, &submitInfo1, !wait?VK_NULL_HANDLE:fence );
-  if(wait) (vkWaitForFences( tmpDevice_, 1, &fence, false, -1 ));
+  if(wait) (vkWaitForFences( device, 1, &fence, false, -1 ));
 //   vkResetCommandPool( device, ( commandPool2 ), VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT );
 }
 

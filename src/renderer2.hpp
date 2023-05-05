@@ -1,5 +1,5 @@
 #pragma once
-#include "TMp.hpp"
+#include "defs.tpp"
 #include <array>
 #include <vulkan/vulkan_core.h>
 
@@ -9,14 +9,13 @@ constexpr VkSemaphoreCreateInfo vkCreateCSemaphore{VK_STRUCTURE_TYPE_SEMAPHORE_C
 
 constexpr VkFenceCreateInfo vkFenceCreateInfo{.sType=VK_STRUCTURE_TYPE_FENCE_CREATE_INFO, .flags=VK_FENCE_CREATE_SIGNALED_BIT};
       
-struct [[clang::trivial_abi]] renderer2 : Tmp
+struct [[clang::trivial_abi]] renderer2
 {
 
 
   [[gnu::hot, gnu::always_inline]] inline void drawFrame() const noexcept;
 
 
-   explicit renderer2(Tmp tmp): Tmp{tmp}{};
 
   static constinit inline uint32_t               imgIndx;
   static constinit inline uint8_t               currentFrame;

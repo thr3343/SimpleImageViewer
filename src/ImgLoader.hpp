@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MemSys2.hpp"
-#include "Vkbase.hpp"
+
 #include "VkCommSet.hpp"
 #include <array>
 

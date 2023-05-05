@@ -3,8 +3,26 @@
 #include <vector>
 #include <fmt/core.h>
 #include <vulkan/vulkan_core.h>
+#include <vulkan/vulkan_win32.h>
 
 
+auto SwapChain::createSurface()  -> VkSurfaceKHR
+{
+          
+      fmt::println("Create Surface!");
+    VkSurfaceKHR surface;
+
+  VkWin32SurfaceCreateInfoKHR createSurfaceInfo
+  {
+        VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
+        VK_NULL_HANDLE,
+        0,
+        inst,
+        hwnd,
+  };
+  vkCreateWin32SurfaceKHR( instance, &createSurfaceInfo, nullptr, &surface);
+  return surface;
+}
 
 
 auto SwapChain::getSwapChainImages(uint32_t size, uint32_t ActiveQueueFamily) -> std::array<VkImage, Frames>
@@ -28,9 +46,9 @@ auto SwapChain::getSwapChainImages(uint32_t size, uint32_t ActiveQueueFamily) ->
     .initialLayout=VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
   };
   
-  vkCreateImage(tmpDevice_, &VkImageCreateInfo, nullptr, swapChainImages.data());
+  vkCreateImage(device, &VkImageCreateInfo, nullptr, swapChainImages.data());
 
-  vkGetSwapchainImagesKHR( tmpDevice_, swapchain, &size, swapChainImages.data());
+  vkGetSwapchainImagesKHR( device, swapchain, &size, swapChainImages.data());
   return swapChainImages;
 }
 
@@ -84,7 +102,7 @@ auto SwapChain::getSwapChainImages(uint32_t size, uint32_t ActiveQueueFamily) ->
 auto SwapChain::handleSwapChainCapabilities() -> SwapchainCapabilities
 {
       VkSurfaceCapabilitiesKHR capabilities;
-  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(tmpPhysDevice_, tmpSurface_, &capabilities );
+  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physDevice, surface, &capabilities );
   fmt::print("maxImageCount {}\n", capabilities.maxImageCount);
   fmt::print("supportedUsageFlags {}\n", capabilities.supportedUsageFlags);
   fmt::print("minExtent:Width {}\n",capabilities.minImageExtent.width, capabilities.minImageExtent.height);
@@ -104,14 +122,14 @@ auto SwapChain::setupImageFormats() -> VkSurfaceFormatKHR
     uint32_t surfaceFormatCount;
     uint32_t presentModeCount;
   
-    getFormats(tmpPhysDevice_, tmpSurface_, surfaceFormatCount, nullptr );
-    vkGetPhysicalDeviceSurfacePresentModesKHR(tmpPhysDevice_, tmpSurface_, &presentModeCount, nullptr );
+    getFormats(physDevice, surface, surfaceFormatCount, nullptr );
+    vkGetPhysicalDeviceSurfacePresentModesKHR(physDevice, surface, &presentModeCount, nullptr );
     
     std::vector<VkSurfaceFormatKHR> surfaceFormats(surfaceFormatCount);
     std::vector<VkPresentModeKHR> presentModes(presentModeCount);
     
-    getFormats(tmpPhysDevice_, tmpSurface_, surfaceFormatCount, surfaceFormats.data() );
-    vkGetPhysicalDeviceSurfacePresentModesKHR(tmpPhysDevice_, tmpSurface_, &presentModeCount, presentModes.data() );
+    getFormats(physDevice, surface, surfaceFormatCount, surfaceFormats.data() );
+    vkGetPhysicalDeviceSurfacePresentModesKHR(physDevice, surface, &presentModeCount, presentModes.data() );
 
     
 
@@ -144,7 +162,7 @@ auto SwapChain::createSwapChain(uint32_t ActiveQueueFamily)->VkSwapchainKHR
 
       .sType   = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
       .pNext   = nullptr,
-      .surface = tmpSurface_,
+      .surface = surface,
 
   
       .minImageCount    = Frames,

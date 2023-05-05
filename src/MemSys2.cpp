@@ -9,9 +9,9 @@ auto MemSys2::setupAlloc(uint32_t vkVer) const -> VmaAllocator
 {
     VmaAllocatorCreateInfo allocatorCreateInfo
     {
-        .physicalDevice=tmpPhysDevice_,
-        .device=tmpDevice_,
-        .instance=tmpInst_,
+        .physicalDevice=physDevice,
+        .device=device,
+        .instance=instance,
         .vulkanApiVersion=vkVer
     };
     VmaAllocator allocator;
@@ -46,15 +46,30 @@ auto MemSys2::allocBuff(VkDeviceSize size, VkBufferUsageFlags usageFlags, VkMemo
     return {b, alloc, size, usageFlags};
 }
 
-auto MemSys2::allocImg(VkExtent3D extent, uint32_t size, VkImageUsageFlags usage, VkImageView view) const -> vmaImage
+auto determineSize(VkExtent2D extent, VkFormat fmt) -> uint32_t
 {
+    uint32_t byteSize;
+    switch(fmt)
+    {
+      case VK_FORMAT_B8G8R8A8_UINT: byteSize=4; break;
+      case VK_FORMAT_B8G8R8_UINT: byteSize=3; break;
+      default: byteSize=4;
+    };
+    return byteSize*extent.width*extent.height;
+}
+
+auto MemSys2::allocImg(VkExtent2D extent, VkFormat format, VkImageUsageFlags usage, VkImageView view) const -> vmaImage
+{
+
+
+    const uint32_t size = determineSize(extent, format);
 
     VkImageCreateInfo bufferCreateInfo
     {
         .sType=VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
         .imageType=VK_IMAGE_TYPE_2D,
-        .format=VK_FORMAT_B8G8R8A8_SRGB,
-        .extent=extent,
+        .format=format,
+        .extent={extent.width, extent.height, 1}, //Always use Depth 1
         .mipLevels=1,
         .arrayLayers=1,
         .samples=VK_SAMPLE_COUNT_1_BIT,

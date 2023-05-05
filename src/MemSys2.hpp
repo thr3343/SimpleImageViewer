@@ -1,7 +1,6 @@
 #pragma once
 #include "defs.tpp"
 #include "Vkbase.hpp"
-#include "TMp.hpp"
 
 #include <cstdint>
 #include <vulkan/vulkan_core.h>
@@ -12,7 +11,7 @@ constexpr VkImageSubresourceLayers subresource alignas(16) = {.aspectMask = VK_I
 	    .baseArrayLayer = 0,
 	    .layerCount = 1,
         };
-constexpr VkDeviceSize defSize=static_cast<const VkDeviceSize>(width*height)*4Ul;
+// constexpr VkDeviceSize defSize=static_cast<const VkDeviceSize>(width*height)*4Ul;
 struct  [[gnu::aligned(32)]] vmaBuffer
 {
 
@@ -51,19 +50,21 @@ struct [[gnu::aligned(32)]] vmaImage
     VkFormat format;
     VkImageView view;
     void* aData;
-    void setCurrent(VkImageLayout lyut) noexcept { this->current=lyut; };
 
 };
-constexpr auto defres=VkExtent3D{width, height, 1};
+constexpr VkExtent3D defres{width, height, 1};
+
+
+constexpr VkExtent2D defres2D{width, height};
 // /*fake enums:*/  using VkMemoryPropertyFlags = uint32_t;
-struct MemSys2:Tmp
+struct MemSys2:GPUDevice
 {
     void* data;
     VmaAllocator a;
     DiscreteQueue q;
-    constexpr explicit MemSys2(uint32_t vkVer, Tmp tmp, DiscreteQueue defQ): q(defQ), a(setupAlloc(vkVer)), Tmp{tmp} {};
+    constexpr explicit MemSys2(uint32_t vkVer, GPUDevice tmp, DiscreteQueue defQ): q(defQ), a(setupAlloc(vkVer)), GPUDevice{tmp} {};
 
     [[nodiscard]] auto setupAlloc(uint32_t) const -> VmaAllocator;
     [[nodiscard]] auto allocBuff(VkDeviceSize, VkBufferUsageFlags, VkMemoryPropertyFlags, bool=false) const -> vmaBuffer;
-    [[nodiscard]] auto allocImg(VkExtent3D =defres, uint32_t=defSize, VkImageUsageFlags=VK_IMAGE_USAGE_TRANSFER_SRC_BIT|VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_STORAGE_BIT, VkImageView=nullptr) const -> vmaImage;
+    [[nodiscard]] auto allocImg(VkExtent2D, VkFormat, VkImageUsageFlags=VK_IMAGE_USAGE_TRANSFER_SRC_BIT|VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_STORAGE_BIT, VkImageView=nullptr) const -> vmaImage;
 };
