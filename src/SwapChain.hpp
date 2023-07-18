@@ -21,7 +21,7 @@ struct SwapChain : GPUDevice,  Win
     SwapchainCapabilities extent;
     VkSwapchainKHR swapchain;
     std::array<VkImage, Frames> swapChainImages;
-    VkPresentModeKHR presentMode;
+    VkPresentModeKHR presentMode=VK_PRESENT_MODE_FIFO_KHR;
 
      explicit SwapChain(GPUDevice swap, uint32_t ActiveQueueFamily)
          :

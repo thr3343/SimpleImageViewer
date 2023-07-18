@@ -20,23 +20,51 @@ struct DiscreteQueue
   uint32_t queuefamilyVarient;
   // uint32_t prio=1;
   // uint32_t capabilities=0;
-};
+} __attribute__((aligned(16)));
 
 
 struct GPUDevice
 {
   VkDevice device;
   DiscreteQueue computeQueue;
+  DiscreteQueue graphicsQueue;
   VkInstance instance;
   VkPhysicalDevice physDevice;
    template<typename type>
     [[nodiscard]] constexpr  auto doPointerAlloc5(auto* __restrict__ strct, auto pHndle) const noexcept -> type
     {
         type pHndl; 
-        pHndle(device, strct, nullptr, &pHndl);
+        chkTst(pHndle(device, strct, nullptr, &pHndl));
       
         return pHndl;
     };
+    template<typename type>
+    constexpr auto doPointerAllocX(auto* strct) const -> type
+    {
+        type pHndl; 
+        vkCreateGraphicsPipelines(device, nullptr, 1, strct, nullptr, &pHndl);
+        return pHndl;
+    }
+    template<typename type>
+    constexpr auto doPointerAllocX2(auto* strct) const -> type
+    {
+        type pHndl; 
+        vkCreateShaderModule(device, strct, nullptr, &pHndl);
+        return pHndl;
+    }
+    
+    template <typename type>
+    constexpr auto doSet( auto &s, auto f) -> std::array<type, Frames>
+    {
+      
+      std::array<type, Frames> aa{};
+
+      for(type  &i: aa)
+      {
+        i=doPointerAlloc5<type>( &s, f);
+      }
+      return aa;
+    }
 };
 
 constexpr void chkTst(int buh = 0) noexcept

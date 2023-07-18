@@ -1,27 +1,25 @@
 #pragma once
+#include "Vkbase.hpp"
 #include "defs.tpp"
 #include <array>
 #include <vulkan/vulkan_core.h>
 
 
 
-constexpr VkSemaphoreCreateInfo vkCreateCSemaphore{VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
+constexpr VkSemaphoreCreateInfo vkCreateCSemaphore{VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO, nullptr};
 
 constexpr VkFenceCreateInfo vkFenceCreateInfo{.sType=VK_STRUCTURE_TYPE_FENCE_CREATE_INFO, .flags=VK_FENCE_CREATE_SIGNALED_BIT};
       
 struct [[clang::trivial_abi]] renderer2
 {
 
-
-  [[gnu::hot, gnu::always_inline]] inline void drawFrame() const noexcept;
+  [[gnu::hot, gnu::always_inline]] inline void drawFrame(std::initializer_list<VkCommandBuffer> commandBuffer) const noexcept;
 
 
 
   static constinit inline uint32_t               imgIndx;
   static constinit inline uint8_t               currentFrame;
-  
-  template <typename type> constexpr auto doSet( auto &s, auto f) -> std::array<type, Frames>;
-
+template <typename type>
 
  
 
@@ -29,16 +27,3 @@ struct [[clang::trivial_abi]] renderer2
 
  
 } __attribute__((aligned(64)));
-
-template <typename type>
-constexpr auto renderer2::doSet( auto &s, auto f) -> std::array<type, Frames>
-{
-   
-   std::array<type, Frames> aa;
-
-   for(type & i: aa)
-   {
-     i=doPointerAlloc5<type>( &s, f);
-   }
-  return aa;
-}

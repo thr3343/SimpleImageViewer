@@ -46,7 +46,7 @@ auto determineQueueFamilies(VkPhysicalDevice physDevice) -> uint32_t
         const auto availableQueues=getQueueFamilies(physDevice);
         //Fallback if onyl one queue is available:
         if(availableQueues.size()==1) return 0;
-        uint32_t i;
+        uint32_t i=0;
         for(const auto& QueueInfo : availableQueues)
         {
                 const bool hasCompute = (QueueInfo.queueFlags&VK_QUEUE_COMPUTE_BIT);
@@ -73,8 +73,7 @@ auto determineQueueFamilies(VkPhysicalDevice physDevice) -> uint32_t
 auto createInstance() -> VkInstance
 {
         fmt::println("Create Instance!");
-             uint32_t vkVer;
-        vkEnumerateInstanceVersion(&vkVer);
+
     
 
         constexpr VkValidationFeaturesEXT  extValidationFeatures
@@ -161,42 +160,52 @@ auto createDevice() -> GPUDevice
 
   const auto physDevice=createPhysDevice();
        const uint32_t computeQueueFamily = determineQueueFamilies(physDevice);
+        uint32_t graphicsQueueFamily =0 ; //Gra[hcis Family is almost always Zero]. Regardless of the Platform + Arch
   
   
 
         constexpr float priority = 1.0f;
  
-        const VkDeviceQueueCreateInfo deviceQueueCreateInfo3 
-        {
+        const auto deviceQueueCreateInfos = std::to_array<VkDeviceQueueCreateInfo>( 
+        {{
                 VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
                 nullptr,
                 0,
-                computeQueueFamily,
+                graphicsQueueFamily,
                 1,
                 &priority,
-        };
+        },{
+                VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+                nullptr,
+                0,
+                2,
+                1,
+                &priority,
+        }});
 
 
-        VkPhysicalDeviceVulkan12Features deviceVulkan12Features{};
+        VkPhysicalDeviceVulkan12Features deviceVulkan12Features{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES};
         VkPhysicalDeviceFeatures2 deviceFeatures2 = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, &deviceVulkan12Features};
 
 
         vkGetPhysicalDeviceFeatures2( physDevice, &deviceFeatures2 );
+        deviceVulkan12Features.imagelessFramebuffer=true;
 
+        
         constexpr auto * deviceExtensions = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
 
         const VkDeviceCreateInfo deviceCreateInfo 
         {
                 .sType=VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-                .pNext=&deviceFeatures2,
+                .pNext=&deviceVulkan12Features,
                 // .flags=0,
-                .queueCreateInfoCount=1,
-                .pQueueCreateInfos=&deviceQueueCreateInfo3,
+                .queueCreateInfoCount=deviceQueueCreateInfos.size(),
+                .pQueueCreateInfos=deviceQueueCreateInfos.data(),
                 // .enabledLayerCount=1,
                 .ppEnabledLayerNames= ENABLE_VALIDATION_LAYERS  ? &validationLayers : nullptr,
                 .enabledExtensionCount= 1,
                 .ppEnabledExtensionNames=&deviceExtensions,
-                .pEnabledFeatures= nullptr
+                .pEnabledFeatures= &deviceFeatures2.features
 
         };
 
@@ -208,11 +217,12 @@ auto createDevice() -> GPUDevice
   vkCreateDevice(physDevice, &deviceCreateInfo, nullptr, &device);
  
     VkQueue GraphicsQueue;
-        vkGetDeviceQueue(device, computeQueueFamily, 0, &GraphicsQueue );
-       
+        vkGetDeviceQueue(device, graphicsQueueFamily, 0, &GraphicsQueue );
+    VkQueue ComputeQueue;
+        vkGetDeviceQueue(device, computeQueueFamily, 0, &ComputeQueue );
+  //Compute + Present Performance regresses when enabling Graphics Queue, Possibly either due to Archietcure Quirks (i.e. Pascall GPU) and/or Sync related
 
-
-  return {device, {GraphicsQueue, computeQueueFamily}, instance, physDevice};
+  return {device, {ComputeQueue, computeQueueFamily}, {GraphicsQueue, graphicsQueueFamily}, instance, physDevice};
         
 }
 

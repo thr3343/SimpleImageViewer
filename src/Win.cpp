@@ -1,4 +1,5 @@
 #include "Win.hpp"
+#include "defs.tpp"
 #include <bit>
 #include <cstdint>
 #include <cstdio>
@@ -55,7 +56,14 @@ if (!glfwInit())
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_CONTEXT_CREATION_API , GLFW_NATIVE_CONTEXT_API);
-    GLFWwindow* window = glfwCreateWindow(width, height, "My Title", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(width, height, "My Title", nullptr, NULL);
+
+auto monitor = glfwGetPrimaryMonitor();
+const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+ 
+
+    glfwSetWindowMonitor(window, monitor, 0, 0, width, height, mode->refreshRate);
     
     // HMODULE hm;
     // GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, std::bit_cast<LPCTSTR>( GetModuleHandle(NULL)), &hm), 

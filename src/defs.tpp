@@ -15,7 +15,7 @@
 constexpr uint8_t Frames = 8u;
 constexpr uint16_t width = 1920;
 constexpr uint16_t height = 1080;
-constexpr bool checks =false;
+constexpr bool checks =true;
 
 //Vulkan Defs
 
@@ -38,6 +38,10 @@ using VkPipelineCache = struct VkPipelineCache_T*;
 using VkDescriptorSet = struct VkDescriptorSet_T*;
 using VkDescriptorPool = struct VkDescriptorPool_T*;
 using VkDescriptorSetLayout = struct VkDescriptorSetLayout_T*;
+using VkFramebuffer = struct VkFramebuffer_T*;
+using VkRenderPass = struct VkRenderPass_T*;
+using VkImageView = struct VkImageView_T*;
+// using VkImageLayout = struct VkImageLayout_T*;
 //Can't forward declare Enums or Structs (Without definition conflicts), So will need to use Vulkan header includes in headers which will inhibit compilation time
 
 //VMA Defs

@@ -40,10 +40,10 @@ auto SwapChain::getSwapChainImages(uint32_t size, uint32_t ActiveQueueFamily) ->
     .arrayLayers=1,
     .samples=VK_SAMPLE_COUNT_1_BIT,
     .tiling=VK_IMAGE_TILING_OPTIMAL,
-    .usage=VK_IMAGE_USAGE_TRANSFER_DST_BIT|VK_IMAGE_USAGE_STORAGE_BIT,
+    .usage=VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
     .queueFamilyIndexCount=1,
     .pQueueFamilyIndices=&ActiveQueueFamily,
-    .initialLayout=VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+    .initialLayout=VK_IMAGE_LAYOUT_UNDEFINED
   };
   
   vkCreateImage(device, &VkImageCreateInfo, nullptr, swapChainImages.data());
@@ -143,11 +143,11 @@ auto SwapChain::setupImageFormats() -> VkSurfaceFormatKHR
     }
     
     
-    for ( const VkPresentModeKHR & presentMode1 : presentModes )
-    {
-        presentMode = (presentMode1  == VK_PRESENT_MODE_IMMEDIATE_KHR)? VK_PRESENT_MODE_IMMEDIATE_KHR : VK_PRESENT_MODE_FIFO_KHR;
-        if(presentMode==VK_PRESENT_MODE_IMMEDIATE_KHR) break;
-    }
+    // for ( const VkPresentModeKHR & presentMode1 : presentModes )
+    // {
+    //     presentMode = (presentMode1  == VK_PRESENT_MODE_IMMEDIATE_KHR)? VK_PRESENT_MODE_IMMEDIATE_KHR : VK_PRESENT_MODE_FIFO_KHR;
+    //     if(presentMode==VK_PRESENT_MODE_IMMEDIATE_KHR) break;
+    // }
        
     
     return swapChainImageFormat;
@@ -170,7 +170,7 @@ auto SwapChain::createSwapChain(uint32_t ActiveQueueFamily)->VkSwapchainKHR
       .imageColorSpace  = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
       .imageExtent      = extent.currentExtent,
       .imageArrayLayers = 1,
-      .imageUsage       = VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+      .imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT ,
 
       .imageSharingMode      = VK_SHARING_MODE_EXCLUSIVE, //Is concurrent even needed in many cases...
       .queueFamilyIndexCount = 1,
@@ -179,7 +179,7 @@ auto SwapChain::createSwapChain(uint32_t ActiveQueueFamily)->VkSwapchainKHR
 
       .preTransform   = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
       .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-      .presentMode    = VK_PRESENT_MODE_IMMEDIATE_KHR,
+      .presentMode    = VK_PRESENT_MODE_FIFO_KHR,
       .clipped        = true,
 
       .oldSwapchain = VK_NULL_HANDLE
@@ -188,44 +188,3 @@ auto SwapChain::createSwapChain(uint32_t ActiveQueueFamily)->VkSwapchainKHR
     return doPointerAlloc5<VkSwapchainKHR>(&createInfo, vkCreateSwapchainKHR);
 }
 
-auto SwapChain::createFramebuffers() -> VkFramebuffer
-{
-        fmt::print("Creating FrameBuffers\n");
-
-
-    constexpr auto format = VK_FORMAT_B8G8R8A8_SRGB;
-    VkFramebufferAttachmentImageInfo FramebufferAttachmentImage
-    {
-      .sType  = VK_STRUCTURE_TYPE_FRAMEBUFFER_ATTACHMENT_IMAGE_INFO,
-      .usage  = VK_IMAGE_USAGE_TRANSFER_DST_BIT,
-      .width  = width,
-      .height = height,
-      .layerCount=1,
-      .viewFormatCount=1,
-      .pViewFormats=&extent.format
-    };
-
-
-    VkFramebufferAttachmentsCreateInfo FramebufferAttachments
-    {
-      .sType=VK_STRUCTURE_TYPE_FRAMEBUFFER_ATTACHMENTS_CREATE_INFO,
-      .attachmentImageInfoCount=1,
-      .pAttachmentImageInfos=&FramebufferAttachmentImage,
-    };
-    
-    VkFramebufferCreateInfo framebufferCreateInfo
-    {
-          .sType                   = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-          .pNext                   = &FramebufferAttachments,
-          .flags                   = VK_FRAMEBUFFER_CREATE_IMAGELESS_BIT,
-          .pAttachments            = nullptr,
-          .width                   = width,
-          .height                  = height,
-          .layers                  = 1,
-    };
-      
-    return doPointerAlloc5<VkFramebuffer>(&framebufferCreateInfo, vkCreateFramebuffer);;
-    
-  
-
-}
