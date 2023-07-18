@@ -12,10 +12,10 @@
 
 #define VEC_CALL(vec) [[nodiscard, gnu::const, gnu::nodebug, gnu::aligned(32), clang::min_vector_width(sizeof(vec))]]  
 
-constexpr uint8_t Frames = 2u;
+constexpr uint8_t Frames = 8u;
 constexpr uint16_t width = 1920;
 constexpr uint16_t height = 1080;
-constexpr bool checks =true;
+constexpr bool checks =false;
 
 //Vulkan Defs
 

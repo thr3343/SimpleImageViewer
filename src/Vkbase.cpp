@@ -8,7 +8,7 @@
 #include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_win32.h>
 
-constexpr bool ENABLE_VALIDATION_LAYERS = true;
+constexpr bool ENABLE_VALIDATION_LAYERS = false;
 
 constexpr auto *validationLayers = "VK_LAYER_KHRONOS_validation";
 constexpr auto extensions       = std::to_array({ VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME}); 
@@ -160,7 +160,7 @@ auto createDevice() -> GPUDevice
 
   const auto physDevice=createPhysDevice();
        const uint32_t computeQueueFamily = determineQueueFamilies(physDevice);
-        uint32_t graphicsQueueFamily =0 ; //Gra[hcis Family is almost always Zero]. Regardless of the Platform + Arch
+       constexpr uint32_t graphicsQueueFamily =0 ; //Gra[hcis Family is almost always Zero]. Regardless of the Platform + Arch
   
   
 
@@ -178,7 +178,7 @@ auto createDevice() -> GPUDevice
                 VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
                 nullptr,
                 0,
-                2,
+                computeQueueFamily,
                 1,
                 &priority,
         }});

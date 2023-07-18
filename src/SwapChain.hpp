@@ -3,6 +3,7 @@
 #include "MemSys2.hpp"
 #include <array>
 #include <cstdint>
+#include <vulkan/vulkan_core.h>
 
 
 
@@ -19,7 +20,7 @@ struct SwapChain : GPUDevice,  Win
    
     VkSurfaceKHR surface;
     SwapchainCapabilities extent;
-    VkSwapchainKHR swapchain;
+    VkSwapchainKHR swapchain=VK_NULL_HANDLE;
     std::array<VkImage, Frames> swapChainImages;
     VkPresentModeKHR presentMode=VK_PRESENT_MODE_FIFO_KHR;
     bool hide = false;

@@ -55,6 +55,8 @@ namespace
   std::array<VkSemaphore, Frames> FinishedSemaphore=gpuDevice.doSet<VkSemaphore>(vkCreateCSemaphore, vkCreateSemaphore);
   std::array<VkSemaphore, Frames> AvailableSemaphore=gpuDevice.doSet<VkSemaphore>(vkCreateCSemaphore, vkCreateSemaphore);
   std::array<VkFence, Frames> frameFences=gpuDevice.doSet<VkFence>(vkFenceCreateInfo, vkCreateFence);
+
+
     bool rSkip=false;
     //const std::array<VkSemaphore, Frames> FinishedSemaphore=fillSet<VkSemaphore>(computePipeline.BGR2RGBSwizzle(imgLoader, device.computeQueue.queue, swapChain.swapChainImages, computePipeline.compSSBO, computePipeline.compSSBODst));
    
@@ -68,7 +70,7 @@ uint32_t tmSecs;
    }
 auto main() -> int
 {
-
+  
    fmt::println("sso_size{}", sso_size);
 
  
@@ -80,8 +82,7 @@ auto main() -> int
         const auto x = clock();
 
         glfwPollEvents(); // PeekMessageA(msg, vkbase.window, WM_KEYFIRST, WM_MOVING, PM_REMOVE);
-  
-        vkResetFences(gpuDevice.device, 1, &frameFences[R2.currentFrame]);
+          vkResetFences(gpuDevice.device, 1, &frameFences[R2.currentFrame]);
         fakevfbo.doCommndRec(R2.currentFrame, x);
        
     
@@ -101,7 +102,7 @@ auto main() -> int
 
     fmt::print("No Window! \n");
     glfwDestroyWindow(swapChain.window);
-    swapChain.~SwapChain();
+    // swapChain.~SwapChain();
 }
 
 void getFrameBufferSize()
@@ -111,7 +112,7 @@ void getFrameBufferSize()
       
         fmt::println("Recreate SwapChain");
         //vkWaitForFences(gpuDevice.device, Frames, frameFences.data(), true, -1);
-        
+        vkDeviceWaitIdle(gpuDevice.device);
       
             uint32_t width = 0, height = 0;
             while (width == 0 || height == 0) {
@@ -119,37 +120,39 @@ void getFrameBufferSize()
                 glfwWaitEvents();
                  fmt::println("FAIL!");
              }
-        vkDeviceWaitIdle(gpuDevice.device);
+        
            {
 
 
                 swapChain.swapchain = swapChain.createSwapChain(width, height, 0);
                 swapChain.swapChainImages = swapChain.getSwapChainImages(Frames, 0);
                 frameBuffer={width, height, frameBuffer.renderPass, swapChain.swapChainImages, gpuDevice};
+                
+                
                 fakevfbo.frameBuffer=frameBuffer.frameBuffer; 
                 fakevfbo.imageViews=frameBuffer.imageViews;
             }
            
 
         //vkResetFences(gpuDevice.device, Frames, frameFences.data());
-          FinishedSemaphore=gpuDevice.doSet<VkSemaphore>(vkCreateCSemaphore, vkCreateSemaphore);
-  AvailableSemaphore=gpuDevice.doSet<VkSemaphore>(vkCreateCSemaphore, vkCreateSemaphore);
-  frameFences=gpuDevice.doSet<VkFence>(vkFenceCreateInfo, vkCreateFence);
+
   rSkip=false;
 
 
 }
 
-auto renderer2::drawFrame(std::initializer_list<VkCommandBuffer> commandBuffer) const noexcept -> bool
+void renderer2::drawFrame(std::initializer_list<VkCommandBuffer> commandBuffer) const noexcept
 {
 
-  if(int a = vkAcquireNextImageKHR( gpuDevice.device, swapChain.swapchain, 10000, AvailableSemaphore[currentFrame], nullptr, &imgIndx )!=VK_SUCCESS || rSkip)
+VkResult a = vkAcquireNextImageKHR( gpuDevice.device, swapChain.swapchain, 10000, AvailableSemaphore[currentFrame], nullptr, &imgIndx );
+  if(a==VK_ERROR_OUT_OF_DATE_KHR||a==VK_SUBOPTIMAL_KHR || rSkip)
   {
             rSkip=false;
             //chkTst(a);
             getFrameBufferSize();
-            return false;
   }
+  else if(a!=VK_SUCCESS&& a!=VK_SUBOPTIMAL_KHR){ chkTst(a);}
+
 
 
   constexpr VkPipelineStageFlags t=VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
@@ -178,10 +181,17 @@ auto renderer2::drawFrame(std::initializer_list<VkCommandBuffer> commandBuffer) 
   };
 
 
-  currentFrame=++currentFrame%Frames;
 
-    vkQueuePresentKHR( gpuDevice.computeQueue.queue, &VkPresentInfoKHR1 );
+
+    int ax = (vkQueuePresentKHR( gpuDevice.computeQueue.queue, &VkPresentInfoKHR1));
+    if(a==VK_ERROR_OUT_OF_DATE_KHR||a==VK_SUBOPTIMAL_KHR || rSkip)
+    {
+                rSkip=false;
+                //chkTst(a);
+                getFrameBufferSize();
+    }
+    else if(a!=VK_SUCCESS&& a!=VK_SUBOPTIMAL_KHR){ chkTst(a);}
    
-          chkTst(vkWaitForFences(gpuDevice.device, 1, &frameFences[currentFrame], false, -1));
-    return true;
+              chkTst(vkWaitForFences(gpuDevice.device, 1, &frameFences[currentFrame], false, -1));
+  currentFrame=++currentFrame%Frames;
 }

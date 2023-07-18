@@ -1,5 +1,6 @@
 #include "SwapChain.hpp"
 #include "GLFW/glfw3.h"
+#include "defs.tpp"
 #include <cstdint>
 #include <vector>
 #include <fmt/core.h>
@@ -170,14 +171,14 @@ auto SwapChain::setupImageFormats() -> VkSurfaceFormatKHR
 auto SwapChain::createSwapChain(uint32_t width, uint32_t height, uint32_t ActiveQueueFamily)->VkSwapchainKHR
 {
     fmt::print("ImageCount: {}\n", Frames);
-
+ auto oldSwapchain=swapchain;
     const VkSwapchainCreateInfoKHR createInfo{
 
       .sType   = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
       .pNext   = nullptr,
       .surface = surface,
 
-  
+     
       .minImageCount    = Frames,
       .imageFormat      = extent.format,
       .imageColorSpace  = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
@@ -192,12 +193,12 @@ auto SwapChain::createSwapChain(uint32_t width, uint32_t height, uint32_t Active
 
       .preTransform   = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
       .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-      .presentMode    = VK_PRESENT_MODE_FIFO_KHR,
+      .presentMode    = VK_PRESENT_MODE_IMMEDIATE_KHR,
       .clipped        = true,
 
-      .oldSwapchain = VK_NULL_HANDLE
+      .oldSwapchain = oldSwapchain
     };
-   
-    return doPointerAlloc5<VkSwapchainKHR>(&createInfo, vkCreateSwapchainKHR);
+
+    return doPointerAlloc5<VkSwapchainKHR>(&createInfo, vkCreateSwapchainKHR);;
 }
 
