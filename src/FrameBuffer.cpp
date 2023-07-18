@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <vulkan/vulkan_core.h>
 
-auto Framebuffer::createFramebuffers() -> VkFramebuffer
+auto Framebuffer::createFramebuffers(uint32_t width, uint32_t height) -> VkFramebuffer
 {
         fmt::print("Creating FrameBuffers\n");
 

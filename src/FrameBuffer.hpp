@@ -6,16 +6,23 @@
 struct Framebuffer : GPUDevice
 {
     VkRenderPass renderPass;
-    VkFramebuffer frameBuffer;
     std::array<VkImageView, Frames> imageViews;
-    Framebuffer(std::array<VkImage, Frames> images, GPUDevice gpuDevice) : 
+    VkFramebuffer frameBuffer;
+    Framebuffer(uint32_t width, uint32_t height, std::array<VkImage, Frames> images, GPUDevice gpuDevice) : 
             renderPass(createRenderPass(VK_IMAGE_LAYOUT_UNDEFINED, false)),
             imageViews(createImageViews(images)),
-            frameBuffer(createFramebuffers()),
+            frameBuffer(createFramebuffers(width, height)),
             GPUDevice{gpuDevice}
             {};
-    auto createFramebuffers() -> VkFramebuffer;
+
+    Framebuffer(uint32_t width, uint32_t height, VkRenderPass renderPass, std::array<VkImage, Frames> images, GPUDevice gpuDevice) : 
+            renderPass(renderPass),
+            imageViews(createImageViews(images)),
+            frameBuffer(createFramebuffers(width, height)),
+            GPUDevice{gpuDevice}
+            {};
+    auto createFramebuffers(uint32_t, uint32_t) -> VkFramebuffer;
     auto createRenderPass(VkImageLayout initial, bool load) -> VkRenderPass;
     auto createImageViews(std::array<VkImage, Frames> images) -> std::array<VkImageView, Frames>;
-
+    ~Framebuffer() = default;
 };

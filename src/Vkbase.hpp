@@ -8,14 +8,13 @@
 struct DiscreteQueue 
 {
 
-  constexpr DiscreteQueue(VkQueue queue, uint32_t queuefamilyVarient)
-      noexcept : queue(queue), queuefamilyVarient(queuefamilyVarient) {}
+  DiscreteQueue(const DiscreteQueue &) = default;
+  DiscreteQueue(DiscreteQueue &&) = default;
+  auto operator=(const DiscreteQueue &) -> DiscreteQueue & = default;
+  auto operator=(DiscreteQueue &&) -> DiscreteQueue & = default;
+  constexpr DiscreteQueue(VkQueue queue, uint32_t queuefamilyVarient) noexcept
+      : queue(queue), queuefamilyVarient(queuefamilyVarient) {}
 
-
-  constexpr DiscreteQueue(const DiscreteQueue &) = default;
-  consteval DiscreteQueue(DiscreteQueue &&) noexcept = default;
-  constexpr auto operator=(const DiscreteQueue &) -> DiscreteQueue & = default;
-  consteval auto operator=(DiscreteQueue &&) noexcept -> DiscreteQueue & = default;
   VkQueue queue;
   uint32_t queuefamilyVarient;
   // uint32_t prio=1;

@@ -34,16 +34,16 @@ namespace
 
      GPUDevice gpuDevice = createDevice();
 
-    const SwapChain swapChain{gpuDevice, gpuDevice.computeQueue.queuefamilyVarient};
+     SwapChain swapChain{width, height, gpuDevice, gpuDevice.computeQueue.queuefamilyVarient};
     const MemSys2 memSys2{vkVer, gpuDevice, gpuDevice.computeQueue};
      
-    const Framebuffer frameBuffer{swapChain.swapChainImages, gpuDevice};
+     Framebuffer frameBuffer{width, height, swapChain.swapChainImages, gpuDevice};
     const Pipeline2 graphicsPipeline{gpuDevice, frameBuffer.renderPass};
     // const ComputePipeline computePipeline{memSys2, swapChain};
     const ImgLoader imgLoader{gpuDevice.computeQueue, memSys2};
     const renderer2 R2;
 
-    const fakeFBO fakevfbo{graphicsPipeline.pipeline, 
+    fakeFBO fakevfbo{graphicsPipeline.pipeline, 
     graphicsPipeline.commandPool,
     frameBuffer.renderPass,
     frameBuffer.frameBuffer, 
@@ -55,7 +55,7 @@ namespace
   std::array<VkSemaphore, Frames> FinishedSemaphore=gpuDevice.doSet<VkSemaphore>(vkCreateCSemaphore, vkCreateSemaphore);
   std::array<VkSemaphore, Frames> AvailableSemaphore=gpuDevice.doSet<VkSemaphore>(vkCreateCSemaphore, vkCreateSemaphore);
   std::array<VkFence, Frames> frameFences=gpuDevice.doSet<VkFence>(vkFenceCreateInfo, vkCreateFence);
-
+    bool rSkip=false;
     //const std::array<VkSemaphore, Frames> FinishedSemaphore=fillSet<VkSemaphore>(computePipeline.BGR2RGBSwizzle(imgLoader, device.computeQueue.queue, swapChain.swapChainImages, computePipeline.compSSBO, computePipeline.compSSBODst));
    
 }  // namespace
@@ -71,7 +71,7 @@ auto main() -> int
 
    fmt::println("sso_size{}", sso_size);
 
-   
+ 
     while(!glfwWindowShouldClose(swapChain.window))
     {
         
@@ -80,6 +80,7 @@ auto main() -> int
         const auto x = clock();
 
         glfwPollEvents(); // PeekMessageA(msg, vkbase.window, WM_KEYFIRST, WM_MOVING, PM_REMOVE);
+  
         vkResetFences(gpuDevice.device, 1, &frameFences[R2.currentFrame]);
         fakevfbo.doCommndRec(R2.currentFrame, x);
        
@@ -103,10 +104,54 @@ auto main() -> int
     swapChain.~SwapChain();
 }
 
-void renderer2::drawFrame(std::initializer_list<VkCommandBuffer> commandBuffer) const noexcept
+void getFrameBufferSize()
+{
+        
+       
+      
+        fmt::println("Recreate SwapChain");
+        //vkWaitForFences(gpuDevice.device, Frames, frameFences.data(), true, -1);
+        
+      
+            uint32_t width = 0, height = 0;
+            while (width == 0 || height == 0) {
+                glfwGetFramebufferSize(swapChain.window, reinterpret_cast<int*>(&width), reinterpret_cast<int*>(&height));
+                glfwWaitEvents();
+                 fmt::println("FAIL!");
+             }
+        vkDeviceWaitIdle(gpuDevice.device);
+           {
+
+
+                swapChain.swapchain = swapChain.createSwapChain(width, height, 0);
+                swapChain.swapChainImages = swapChain.getSwapChainImages(Frames, 0);
+                frameBuffer={width, height, frameBuffer.renderPass, swapChain.swapChainImages, gpuDevice};
+                fakevfbo.frameBuffer=frameBuffer.frameBuffer; 
+                fakevfbo.imageViews=frameBuffer.imageViews;
+            }
+           
+
+        //vkResetFences(gpuDevice.device, Frames, frameFences.data());
+          FinishedSemaphore=gpuDevice.doSet<VkSemaphore>(vkCreateCSemaphore, vkCreateSemaphore);
+  AvailableSemaphore=gpuDevice.doSet<VkSemaphore>(vkCreateCSemaphore, vkCreateSemaphore);
+  frameFences=gpuDevice.doSet<VkFence>(vkFenceCreateInfo, vkCreateFence);
+  rSkip=false;
+
+
+}
+
+auto renderer2::drawFrame(std::initializer_list<VkCommandBuffer> commandBuffer) const noexcept -> bool
 {
 
-  chkTst(vkAcquireNextImageKHR( gpuDevice.device, swapChain.swapchain, -1, AvailableSemaphore[currentFrame], nullptr, &imgIndx ));
+  if(int a = vkAcquireNextImageKHR( gpuDevice.device, swapChain.swapchain, 10000, AvailableSemaphore[currentFrame], nullptr, &imgIndx )!=VK_SUCCESS || rSkip)
+  {
+            rSkip=false;
+            //chkTst(a);
+            getFrameBufferSize();
+            return false;
+  }
+
+
   constexpr VkPipelineStageFlags t=VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
       const  VkSubmitInfo           info{
               .sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
@@ -119,8 +164,8 @@ void renderer2::drawFrame(std::initializer_list<VkCommandBuffer> commandBuffer) 
               .pSignalSemaphores = &FinishedSemaphore[currentFrame]
   };
   
-  vkQueueSubmit(gpuDevice.graphicsQueue.queue, 1, &info, frameFences[currentFrame]);
-      
+  chkTst(vkQueueSubmit(gpuDevice.graphicsQueue.queue, 1, &info, frameFences[currentFrame]));
+
   const VkPresentInfoKHR VkPresentInfoKHR1 alignas(32)
   { 
     .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
@@ -135,7 +180,8 @@ void renderer2::drawFrame(std::initializer_list<VkCommandBuffer> commandBuffer) 
 
   currentFrame=++currentFrame%Frames;
 
-  chkTst(vkQueuePresentKHR( gpuDevice.computeQueue.queue, &VkPresentInfoKHR1 ));
+    vkQueuePresentKHR( gpuDevice.computeQueue.queue, &VkPresentInfoKHR1 );
+   
           chkTst(vkWaitForFences(gpuDevice.device, 1, &frameFences[currentFrame], false, -1));
-
+    return true;
 }

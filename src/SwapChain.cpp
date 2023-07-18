@@ -1,4 +1,5 @@
 #include "SwapChain.hpp"
+#include "GLFW/glfw3.h"
 #include <cstdint>
 #include <vector>
 #include <fmt/core.h>
@@ -24,29 +25,42 @@ auto SwapChain::createSurface()  -> VkSurfaceKHR
   return surface;
 }
 
+void SwapChain::hideWindow()
+{
+  if(hide==false) 
+  {
+    glfwHideWindow(this->window);
+    hide=true;
+  }
+  else if(hide==true) {
+    glfwShowWindow(this->window);
+    hide=false;
+  }
+ 
+}
 
 auto SwapChain::getSwapChainImages(uint32_t size, uint32_t ActiveQueueFamily) -> std::array<VkImage, Frames>
 {
   fmt::print( "get SwapChain Images\n");
 
 
-  VkImageCreateInfo VkImageCreateInfo{
-    .sType=VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-    // .flags=VK_IMAGE_CREATE_EXTENDED_USAGE_BIT,
-    .imageType=VK_IMAGE_TYPE_2D,
-    .format=VK_FORMAT_B8G8R8A8_SRGB,
-    .extent{width,height,1},
-    .mipLevels=1,
-    .arrayLayers=1,
-    .samples=VK_SAMPLE_COUNT_1_BIT,
-    .tiling=VK_IMAGE_TILING_OPTIMAL,
-    .usage=VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-    .queueFamilyIndexCount=1,
-    .pQueueFamilyIndices=&ActiveQueueFamily,
-    .initialLayout=VK_IMAGE_LAYOUT_UNDEFINED
-  };
+  // VkImageCreateInfo VkImageCreateInfo{
+  //   .sType=VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+  //   // .flags=VK_IMAGE_CREATE_EXTENDED_USAGE_BIT,
+  //   .imageType=VK_IMAGE_TYPE_2D,
+  //   .format=VK_FORMAT_B8G8R8A8_SRGB,
+  //   .extent{width,height,1},
+  //   .mipLevels=1,
+  //   .arrayLayers=1,
+  //   .samples=VK_SAMPLE_COUNT_1_BIT,
+  //   .tiling=VK_IMAGE_TILING_OPTIMAL,
+  //   .usage=VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+  //   .queueFamilyIndexCount=1,
+  //   .pQueueFamilyIndices=&ActiveQueueFamily,
+  //   .initialLayout=VK_IMAGE_LAYOUT_UNDEFINED
+  // };
   
-  vkCreateImage(device, &VkImageCreateInfo, nullptr, swapChainImages.data());
+  // vkCreateImage(device, &VkImageCreateInfo, nullptr, swapChainImages.data());
 
   vkGetSwapchainImagesKHR( device, swapchain, &size, swapChainImages.data());
   return swapChainImages;
@@ -153,10 +167,9 @@ auto SwapChain::setupImageFormats() -> VkSurfaceFormatKHR
     return swapChainImageFormat;
 }
 
-auto SwapChain::createSwapChain(uint32_t ActiveQueueFamily)->VkSwapchainKHR
+auto SwapChain::createSwapChain(uint32_t width, uint32_t height, uint32_t ActiveQueueFamily)->VkSwapchainKHR
 {
     fmt::print("ImageCount: {}\n", Frames);
-    
 
     const VkSwapchainCreateInfoKHR createInfo{
 
@@ -168,9 +181,9 @@ auto SwapChain::createSwapChain(uint32_t ActiveQueueFamily)->VkSwapchainKHR
       .minImageCount    = Frames,
       .imageFormat      = extent.format,
       .imageColorSpace  = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
-      .imageExtent      = extent.currentExtent,
+      .imageExtent      = {width, height},
       .imageArrayLayers = 1,
-      .imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT ,
+      .imageUsage       = VK_IMAGE_USAGE_TRANSFER_SRC_BIT|VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
 
       .imageSharingMode      = VK_SHARING_MODE_EXCLUSIVE, //Is concurrent even needed in many cases...
       .queueFamilyIndexCount = 1,

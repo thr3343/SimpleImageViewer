@@ -13,7 +13,7 @@ constexpr VkFenceCreateInfo vkFenceCreateInfo{.sType=VK_STRUCTURE_TYPE_FENCE_CRE
 struct [[clang::trivial_abi]] renderer2
 {
 
-  [[gnu::hot, gnu::always_inline]] inline void drawFrame(std::initializer_list<VkCommandBuffer> commandBuffer) const noexcept;
+  [[gnu::hot, gnu::always_inline]] [[nodiscard]] inline auto drawFrame(std::initializer_list<VkCommandBuffer> commandBuffer) const noexcept -> bool;
 
 
 

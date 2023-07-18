@@ -22,17 +22,17 @@ struct SwapChain : GPUDevice,  Win
     VkSwapchainKHR swapchain;
     std::array<VkImage, Frames> swapChainImages;
     VkPresentModeKHR presentMode=VK_PRESENT_MODE_FIFO_KHR;
-
-     explicit SwapChain(GPUDevice swap, uint32_t ActiveQueueFamily)
+    bool hide = false;
+     explicit SwapChain(uint32_t width, uint32_t height, GPUDevice swap, uint32_t ActiveQueueFamily)
          :
            surface(createSurface()),
            extent(handleSwapChainCapabilities()),
-           swapchain(createSwapChain(ActiveQueueFamily)),
+           swapchain(createSwapChain(width, height, ActiveQueueFamily)),
            swapChainImages(getSwapChainImages(Frames, ActiveQueueFamily)),
            SwapChain::GPUDevice(swap){}; // TODO(Vcmp): use Move Construction to avoid duplciating the handles: (Minor Mem Leak)
      [[nodiscard]] auto createSurface() -> VkSurfaceKHR;
      auto handleSwapChainCapabilities() -> SwapchainCapabilities;
-     auto createSwapChain(uint32_t) -> VkSwapchainKHR;
+     auto createSwapChain(uint32_t, uint32_t, uint32_t) -> VkSwapchainKHR;
      [[gnu::unused]] auto createRenderPass(VkImageLayout initial=VK_IMAGE_LAYOUT_UNDEFINED, bool load=false) -> VkRenderPass;
      [[gnu::unused]] auto createFramebuffers() -> VkFramebuffer;
 
@@ -44,6 +44,6 @@ struct SwapChain : GPUDevice,  Win
          -> std::array<VkImageView, Frames>;
 
      [[nodiscard]] auto createImageView(vmaImage image) const -> VkImageView;
-
+     void hideWindow();
      [[gnu::cold]] ~SwapChain() { vkDestroySwapchainKHR(device, swapchain, nullptr); }
 };

@@ -8,8 +8,8 @@ add_executable(SimpleImageViewer)
 add_compile_definitions(SimpleImageViewer PRIVATE WIN32_LEAN_AND_MEAN VK_USE_PLATFORM_WIN32_KHR _GLFW_VULKAN_STATIC _LIBCPP_HAS_NO_CHAR8_T)
 target_compile_features(SimpleImageViewer PRIVATE cxx_std_23)
 # target_compile_features(SimpleImageViewer PRIVATE c_std_23)
-target_link_options(SimpleImageViewer PRIVATE -fsanitize=address,undefined)
-target_compile_options(SimpleImageViewer PRIVATE -march=native -mtune=native -save-temps -masm=intel -O0 -glldb -fno-char8_t -fno-exceptions -Wuninitialized -Weffc++)
+# target_link_options(SimpleImageViewer PRIVATE -fsanitize=address,undefined)
+target_compile_options(SimpleImageViewer PRIVATE -march=native -mtune=native -save-temps -masm=intel -Ofast -fno-char8_t -fno-exceptions -Wuninitialized -Weffc++)
 
 	target_sources(SimpleImageViewer
 		PRIVATE
