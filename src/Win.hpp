@@ -44,9 +44,8 @@ const HINSTANCE inst =  std::bit_cast<HINSTANCE>(&__ImageBase);
         GLFWwindow*  window =init();
         HWND hwnd = nInit();
         bool min=false;
-        uint16_t X=width;
-        uint16_t Y=height;
-      
+        uint32_t width,height;
+          
         auto hInst() -> HINSTANCE;
 
         auto init() -> GLFWwindow*;

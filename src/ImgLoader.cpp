@@ -140,10 +140,10 @@ void ImgLoader::loadImg(VkCommSet commandBufferSets, VkQueue queue, vmaImage vma
     // std::cout << sizeof(limg) <<"--"<< x <<"--"<< y <<"--"<< cnls << "\n";
     fmt::print("Loaded Image in : {}\n", clock() - a/CLOCKS_PER_SEC);
  
-     uint32_t imageSize = width * height*4UL;
+     uint32_t imageSize = x * y*4UL;
 
 
-    constexpr VkOffset2D Offs{width, height};
+    const VkOffset2D Offs{x, y};
 
 
 
@@ -256,8 +256,8 @@ void ImgLoader::transitionImageLayout( VkCommandBuffer commandBuffer, VkImageLay
 
 [[gnu::pure]] auto __vectorcall aspect(VkExtent2D extent)
 {
-  constexpr auto asp =static_cast<double>(width)/height;
+  // constexpr auto asp =static_cast<double>(width)/height;
 
-  auto asp3 = static_cast<float>(extent.width)/extent.height;
-  return (asp3>asp) ? VkOffset2D{static_cast<int>(height-(width/asp3)), 0} : VkOffset2D{0, static_cast<int>(fma2(width, asp3, -width))};
+  // auto asp3 = static_cast<float>(extent.width)/extent.height;
+  // return (asp3>asp) ? VkOffset2D{static_cast<int>(height-(width/asp3)), 0} : VkOffset2D{0, static_cast<int>(fma2(width, asp3, -width))};
 }

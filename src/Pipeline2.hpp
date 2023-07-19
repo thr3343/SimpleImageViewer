@@ -10,9 +10,7 @@
  static constexpr uint8_t OFFSETOF_COLOR = 3 * sizeof( float );
   static constexpr uint8_t OFFSET_POS     = 0;
 
-constexpr VkViewport vkViewport{ .x = 0.0F, .y = 0.0F, .width = width, .height = height, .minDepth = 0.0F, .maxDepth = 1.0F };
 
-constexpr VkRect2D scissor{ .offset { 0, 0 }, .extent{ width, height } };
 
 constexpr std::array<VkShaderModuleCreateInfo, 2> shaderStages2{VsMCI3temp, VsMCI4temp};
 
@@ -22,13 +20,13 @@ struct [[clang::trivial_abi]] Pipeline2:GPUDevice
      VkPipeline pipeline;
      VkCommandPool commandPool=genCommPool();
      std::array<VkCommandBuffer, Frames>commandBuffer=doGenCommnd(commandPool);
-     explicit Pipeline2(GPUDevice gpuDevice, VkRenderPass renderPass): 
-            pipeline(genPipeline(renderPass, VK_CULL_MODE_NONE, -1)), 
+     explicit Pipeline2(uint32_t width, uint32_t height, GPUDevice gpuDevice, VkRenderPass renderPass): 
+            pipeline(genPipeline(width, height, renderPass, VK_CULL_MODE_NONE, -1)), 
             GPUDevice{gpuDevice} 
      {};
 
      
-    constexpr auto genPipeline(VkRenderPass, VkCullModeFlagBits, int32_t) const -> VkPipeline;
+    constexpr auto genPipeline(uint32_t, uint32_t, VkRenderPass, VkCullModeFlagBits, int32_t) const -> VkPipeline;
     void genCommBuffers();
    [[nodiscard]] auto genCommPool() const -> VkCommandPool;
    [[nodiscard]] auto doGenCommnd(VkCommandPool) const -> std::array<VkCommandBuffer, Frames>;
@@ -52,7 +50,7 @@ constexpr auto Pipeline2::genShaderPiplineStage(VkShaderModuleCreateInfo a, VkSh
 
 
 
-constexpr auto Pipeline2::genPipeline(VkRenderPass renderPass, VkCullModeFlagBits cullMode, int32_t baseIndex) const -> VkPipeline
+constexpr auto Pipeline2::genPipeline(uint32_t width, uint32_t height, VkRenderPass renderPass, VkCullModeFlagBits cullMode, int32_t baseIndex) const -> VkPipeline
 {
     // Thankfully Dont; need to worry about compiling the Shader Files AnyMore due
   // to teh ability to premptively use the SPRI-V Compielr (e.g.GLSLC) prior to compile time...
@@ -83,9 +81,11 @@ constexpr auto Pipeline2::genPipeline(VkRenderPass renderPass, VkCullModeFlagBit
    constexpr VkPipelineInputAssemblyStateCreateInfo inputAssembly { .sType    = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
                                                                             .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
                                                                             .primitiveRestartEnable = VK_FALSE };
+const VkViewport vkViewport{ .x = 0.0F, .y = 0.0F, .width = static_cast<float>(width), .height = static_cast<float>(height), .minDepth = 0.0F, .maxDepth = 1.0F };
 
+const VkRect2D scissor{ .offset { 0, 0 }, .extent{ width, height } };
 
-  constexpr VkPipelineViewportStateCreateInfo vkViewPortState {
+  const VkPipelineViewportStateCreateInfo vkViewPortState {
     .sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO, .viewportCount = 1, .pViewports = &vkViewport, .scissorCount = 1, .pScissors = &scissor
   };
 

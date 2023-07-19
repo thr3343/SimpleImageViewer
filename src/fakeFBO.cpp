@@ -1,32 +1,27 @@
 #include "fakeFBO.hpp"
-#include "glm/ext/vector_int2.hpp"
+#include <cstdint>
+
+
+using v4 [[gnu::vector_size(16)]] = float;
 
 
 
-
-struct ITime
-{
-  glm::ivec2 xy;
-  float time;
-  float stime;
-} __attribute__((aligned(16))) ;
-
-
-void fakeFBO::doCommndRec(uint32_t a, clock_t time) const
+void fakeFBO::doCommndRec(uint32_t width, uint32_t height, uint32_t a, clock_t time) const
 {
 
   
       constexpr VkCommandBufferBeginInfo beginInfo1 = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
                                                     .flags =  VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT };
 
-    constexpr VkRect2D renderArea = { .offset = { 0, 0 }, .extent = {width, height} };
+    const VkRect2D renderArea = { .offset = { 0, 0 }, .extent = {width, height} };
 
 
   
-  static constexpr VkDeviceSize offsets[] = { 0 };
+  // static constexpr VkDeviceSize offsets[] = { 0 };
   // uint32_t i = 0; 
   const auto at = static_cast<float>(time)/1000;
-  const ITime iTime = {{(width), (height)}, at, sinf(at)};
+
+  const v4 iTime{static_cast<float>(width), static_cast<float>(height), at, sinf(at)};
 
   /* for(const VkCommandBuffer &commandBuffer : commandBuffers)
   {*/VkRenderPassAttachmentBeginInfo RenderPassAttachments

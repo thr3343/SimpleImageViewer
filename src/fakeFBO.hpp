@@ -22,7 +22,7 @@ struct [[clang::trivial_abi]] fakeFBO
     std::array<VkCommandBuffer, Frames> commandBuffers;
     // static VkCommandBuffer doCommBuffers(VkCommandPool, uint32_t);
     // std::array<VkCommandBuffer, Frames> doGenCommnd();
-    void doCommndRec(uint32_t, clock_t) const;
+    void doCommndRec(uint32_t, uint32_t, uint32_t, clock_t) const;
 
     
 } __attribute__((aligned(128)));

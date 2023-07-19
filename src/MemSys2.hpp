@@ -52,10 +52,10 @@ struct [[gnu::aligned(32)]] vmaImage
     void* aData;
 
 };
-constexpr VkExtent3D defres{width, height, 1};
+constexpr VkExtent3D defres{UINT16_MAX, UINT16_MAX, 1};
 
 
-constexpr VkExtent2D defres2D{width, height};
+constexpr VkExtent2D defres2D{UINT16_MAX, UINT16_MAX};
 // /*fake enums:*/  using VkMemoryPropertyFlags = uint32_t;
 struct MemSys2:GPUDevice
 {

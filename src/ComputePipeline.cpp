@@ -186,8 +186,8 @@ auto ComputePipeline::BGR2RGBSwizzle(ImgLoader const &imgLoader, VkQueue queue, 
         .srcSubresource=subresource,
         .extent=defres
     };
-    constexpr uint64_t scaleX=(width/32);  
-    constexpr uint64_t scaleY=(height/32);  
+    const uint64_t scaleX=(src.extent.width/32);  
+    const uint64_t scaleY=(src.extent.height/32);  
     vkCmdDispatch(commSet.commandBuffer, scaleX, scaleY, 1);
 
 

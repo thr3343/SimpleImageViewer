@@ -34,11 +34,11 @@ namespace
 
      GPUDevice gpuDevice = createDevice();
 
-     SwapChain swapChain{width, height, gpuDevice, gpuDevice.computeQueue.queuefamilyVarient};
+     SwapChain swapChain{gpuDevice, gpuDevice.computeQueue.queuefamilyVarient};
     const MemSys2 memSys2{vkVer, gpuDevice, gpuDevice.computeQueue};
      
-     Framebuffer frameBuffer{width, height, swapChain.swapChainImages, gpuDevice};
-    const Pipeline2 graphicsPipeline{gpuDevice, frameBuffer.renderPass};
+     Framebuffer frameBuffer{swapChain.width, swapChain.height, swapChain.swapChainImages, gpuDevice};
+    const Pipeline2 graphicsPipeline{swapChain.width, swapChain.height, gpuDevice, frameBuffer.renderPass};
     // const ComputePipeline computePipeline{memSys2, swapChain};
     const ImgLoader imgLoader{gpuDevice.computeQueue, memSys2};
     const renderer2 R2;
@@ -83,7 +83,7 @@ auto main() -> int
 
         glfwPollEvents(); // PeekMessageA(msg, vkbase.window, WM_KEYFIRST, WM_MOVING, PM_REMOVE);
           vkResetFences(gpuDevice.device, 1, &frameFences[R2.currentFrame]);
-        fakevfbo.doCommndRec(R2.currentFrame, x);
+        fakevfbo.doCommndRec(swapChain.width, swapChain.height, R2.currentFrame, x);
        
     
         R2.drawFrame({fakevfbo.commandBuffers[R2.currentFrame]});

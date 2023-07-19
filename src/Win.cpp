@@ -56,12 +56,18 @@ if (!glfwInit())
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_CONTEXT_CREATION_API , GLFW_NATIVE_CONTEXT_API);
-    GLFWwindow* window = glfwCreateWindow(width, height, "My Title", nullptr, NULL);
 
 auto monitor = glfwGetPrimaryMonitor();
 const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
  
+  this->width=mode->width;
+  this->height=mode->height;
+glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+    
+    GLFWwindow* window = glfwCreateWindow(width, height, "My Title", monitor, NULL);
+
+
 
     glfwSetWindowMonitor(window, monitor, 0, 0, width, height, mode->refreshRate);
     

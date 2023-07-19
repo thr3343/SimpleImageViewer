@@ -171,6 +171,9 @@ auto SwapChain::setupImageFormats() -> VkSurfaceFormatKHR
 auto SwapChain::createSwapChain(uint32_t width, uint32_t height, uint32_t ActiveQueueFamily)->VkSwapchainKHR
 {
     fmt::print("ImageCount: {}\n", Frames);
+
+     //glfwGetFramebufferSize(this->window, reinterpret_cast<int*>(&width), reinterpret_cast<int*>(&height));
+
  auto oldSwapchain=swapchain;
     const VkSwapchainCreateInfoKHR createInfo{
 
@@ -193,12 +196,13 @@ auto SwapChain::createSwapChain(uint32_t width, uint32_t height, uint32_t Active
 
       .preTransform   = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
       .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-      .presentMode    = VK_PRESENT_MODE_IMMEDIATE_KHR,
+      .presentMode    = VK_PRESENT_MODE_FIFO_KHR,
       .clipped        = true,
 
       .oldSwapchain = oldSwapchain
     };
-
+    this->width=width;
+    this->height=height;
     return doPointerAlloc5<VkSwapchainKHR>(&createInfo, vkCreateSwapchainKHR);;
 }
 

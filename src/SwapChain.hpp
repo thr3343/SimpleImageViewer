@@ -17,14 +17,15 @@ struct SwapchainCapabilities {
 
 struct SwapChain : GPUDevice,  Win
 {
-   
+    // uint32_t width;
+    // uint32_t height;
     VkSurfaceKHR surface;
     SwapchainCapabilities extent;
     VkSwapchainKHR swapchain=VK_NULL_HANDLE;
     std::array<VkImage, Frames> swapChainImages;
     VkPresentModeKHR presentMode=VK_PRESENT_MODE_FIFO_KHR;
     bool hide = false;
-     explicit SwapChain(uint32_t width, uint32_t height, GPUDevice swap, uint32_t ActiveQueueFamily)
+     explicit SwapChain(GPUDevice swap, uint32_t ActiveQueueFamily)
          :
            surface(createSurface()),
            extent(handleSwapChainCapabilities()),
