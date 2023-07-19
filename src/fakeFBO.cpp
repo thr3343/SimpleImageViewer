@@ -2,7 +2,7 @@
 #include <cstdint>
 
 
-using v4 [[gnu::vector_size(16)]] = float;
+using v4 [[gnu::vector_size(16), gnu::aligned(16)]] = float;
 
 
 
@@ -46,8 +46,8 @@ void fakeFBO::doCommndRec(uint32_t width, uint32_t height, uint32_t a, clock_t t
     vkCmdBeginRenderPass(commandBuffers[a], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE );
 
     vkCmdBindPipeline(commandBuffers[a], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeLine );
-     
-    vkCmdPushConstants(commandBuffers[a],layout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, 16, &iTime);
+
+    vkCmdPushConstants(commandBuffers[a],layout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(v4), &iTime);
 
 
     vkCmdDraw( commandBuffers[a], ( 3), 1, 0, 0 );
