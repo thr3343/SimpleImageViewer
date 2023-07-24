@@ -203,6 +203,11 @@ auto SwapChain::createSwapChain(uint32_t width, uint32_t height, uint32_t Active
     };
     this->width=width;
     this->height=height;
-    return doPointerAlloc5<VkSwapchainKHR>(&createInfo, vkCreateSwapchainKHR);;
+    const auto a = doPointerAlloc5<VkSwapchainKHR>(&createInfo, vkCreateSwapchainKHR);
+    if(oldSwapchain!=VK_NULL_HANDLE)
+    {
+      vkDestroySwapchainKHR(device, oldSwapchain, nullptr);
+    }
+    return a;
 }
 

@@ -1,4 +1,5 @@
 #include <GLFW/glfw3.h>
+#include <cstdint>
 #include <ctime>
 #include <vulkan/vulkan_core.h>
 
@@ -105,23 +106,46 @@ auto main() -> int
     // swapChain.~SwapChain();
 }
 
-void getFrameBufferSize()
+void waitForSwapChain()
+{
+        constexpr VkPipelineStageFlags t=VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        //Empty Submit
+        const VkSubmitInfo info
+        {
+            VK_STRUCTURE_TYPE_SUBMIT_INFO,
+            nullptr,
+            1,
+            &AvailableSemaphore[R2.currentFrame],
+            &t,
+            0,
+            nullptr,
+            0,
+            nullptr
+        };
+        vkQueueSubmit(gpuDevice.graphicsQueue.queue, 1, &info, frameFences[R2.currentFrame]);
+        chkTst(vkWaitForFences(gpuDevice.device, 1, &frameFences[R2.currentFrame], true, -1));
+}
+
+void getFrameBufferSize(std::initializer_list<VkCommandBuffer> commandBuffer)
 {
         
        
       
         fmt::println("Recreate SwapChain");
-        //vkWaitForFences(gpuDevice.device, Frames, frameFences.data(), true, -1);
-        vkDeviceWaitIdle(gpuDevice.device);
+        vkWaitForFences(gpuDevice.device, Frames, frameFences.data(), true, -1);
+
       
             uint32_t width = 0, height = 0;
-            while (width == 0 || height == 0) {
+            
+            {
                 glfwGetFramebufferSize(swapChain.window, reinterpret_cast<int*>(&width), reinterpret_cast<int*>(&height));
                 glfwWaitEvents();
-                 fmt::println("FAIL!");
-             }
+                 printf("%i , %i \n", width, height);
+            }
+                 
+             
         
-           {
+           if(width!=0&&height!=0){
 
 
                 swapChain.swapchain = swapChain.createSwapChain(width, height, 0);
@@ -145,14 +169,14 @@ void renderer2::drawFrame(std::initializer_list<VkCommandBuffer> commandBuffer) 
 {
 
 VkResult a = vkAcquireNextImageKHR( gpuDevice.device, swapChain.swapchain, 10000, AvailableSemaphore[currentFrame], nullptr, &imgIndx );
-  if(a==VK_ERROR_OUT_OF_DATE_KHR||a==VK_SUBOPTIMAL_KHR || rSkip)
+  if(a==VK_ERROR_OUT_OF_DATE_KHR)
   {
-            rSkip=false;
-            //chkTst(a);
-            getFrameBufferSize();
+            
+            waitForSwapChain();
+            getFrameBufferSize(commandBuffer);
+            return;
   }
   else if(a!=VK_SUCCESS&& a!=VK_SUBOPTIMAL_KHR){ chkTst(a);}
-
 
 
   constexpr VkPipelineStageFlags t=VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
@@ -184,14 +208,13 @@ VkResult a = vkAcquireNextImageKHR( gpuDevice.device, swapChain.swapchain, 10000
 
 
     int ax = (vkQueuePresentKHR( gpuDevice.computeQueue.queue, &VkPresentInfoKHR1));
-    if(a==VK_ERROR_OUT_OF_DATE_KHR||a==VK_SUBOPTIMAL_KHR || rSkip)
-    {
-                rSkip=false;
-                //chkTst(a);
-                getFrameBufferSize();
-    }
-    else if(a!=VK_SUCCESS&& a!=VK_SUBOPTIMAL_KHR){ chkTst(a);}
-   
+      if(ax==VK_ERROR_OUT_OF_DATE_KHR||ax==VK_SUBOPTIMAL_KHR || rSkip)
+      {
+                vkDeviceWaitIdle(gpuDevice.device);
+                getFrameBufferSize(commandBuffer);
+      }
+      else if(ax!=VK_SUCCESS&& ax!=VK_SUBOPTIMAL_KHR){ chkTst(ax);}
+
               chkTst(vkWaitForFences(gpuDevice.device, 1, &frameFences[currentFrame], false, -1));
   currentFrame=++currentFrame%Frames;
 }
