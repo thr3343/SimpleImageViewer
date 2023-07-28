@@ -15,6 +15,8 @@
 #include "Pipeline2.hpp"
 
 
+
+
 constexpr size_t sso_size = std::string{}.capacity();
 
 /*todo(thr3343): 
@@ -36,7 +38,7 @@ namespace
      GPUDevice gpuDevice = createDevice();
 
      SwapChain swapChain{gpuDevice, gpuDevice.computeQueue.queuefamilyVarient};
-    const MemSys2 memSys2{vkVer, gpuDevice, gpuDevice.computeQueue};
+    const MemSys2 memSys2{vkVersion, gpuDevice, gpuDevice.computeQueue};
      
      Framebuffer frameBuffer{swapChain.width, swapChain.height, swapChain.swapChainImages, gpuDevice};
     const Pipeline2 graphicsPipeline{swapChain.width, swapChain.height, gpuDevice, frameBuffer.renderPass};
@@ -138,7 +140,7 @@ void getFrameBufferSize(std::initializer_list<VkCommandBuffer> commandBuffer)
             uint32_t width = 0, height = 0;
             
             {
-                glfwGetFramebufferSize(swapChain.window, reinterpret_cast<int*>(&width), reinterpret_cast<int*>(&height));
+                glfwSetWindowSize(swapChain.window, *reinterpret_cast<int*>(&width), *reinterpret_cast<int*>(&height));
                 glfwWaitEvents();
                  printf("%i , %i \n", width, height);
             }

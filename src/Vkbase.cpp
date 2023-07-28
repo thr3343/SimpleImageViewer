@@ -8,7 +8,7 @@
 #include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_win32.h>
 
-constexpr bool ENABLE_VALIDATION_LAYERS = false;
+constexpr bool DEBUG = false;
 
 constexpr auto *validationLayers = "VK_LAYER_KHRONOS_validation";
 constexpr auto extensions       = std::to_array({ VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME}); 
@@ -23,6 +23,41 @@ constexpr auto valdFeatures     = std::to_array({ VK_VALIDATION_FEATURE_ENABLE_G
         return a;
 }  
 
+[[nodiscard, gnu::const]] auto createInstance() -> VkInstance
+{
+        fmt::println("Create Instance!");
+
+        constexpr VkValidationFeaturesEXT  extValidationFeatures {
+                VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT,
+                nullptr,
+                valdFeatures.size(),
+                valdFeatures.begin(),
+        };
+        
+        const VkApplicationInfo vkApplInfo {
+                VK_STRUCTURE_TYPE_APPLICATION_INFO,
+                nullptr,
+                "SimpleImageView",
+                vkVersion,
+                "No Engine",
+                vkVersion,
+                vkVersion
+        };
+  
+        VkInstanceCreateInfo InstCreateInfo {
+                .sType                          = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+                .pNext                          = DEBUG ? &extValidationFeatures : nullptr,
+                .pApplicationInfo               = &vkApplInfo,
+                .enabledLayerCount              = DEBUG ? 1u : 0u,
+                .ppEnabledLayerNames            = DEBUG ? &validationLayers : nullptr,
+                .enabledExtensionCount          = extensions.size(),
+                .ppEnabledExtensionNames        = extensions.begin(),
+        };
+
+        VkInstance vki;
+        vkCreateInstance(&InstCreateInfo, nullptr, &vki);
+        return vki;
+}
     
 //Only the Compute queue is used currently as only the compute pipeline is needed atm.
 struct QueueFamilyVarients
@@ -70,54 +105,6 @@ auto determineQueueFamilies(VkPhysicalDevice physDevice) -> uint32_t
 
 
 
-auto createInstance() -> VkInstance
-{
-        fmt::println("Create Instance!");
-
-    
-
-        constexpr VkValidationFeaturesEXT  extValidationFeatures
-        {
-                VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT,
-                nullptr,
-                valdFeatures.size(),
-                valdFeatures.begin(),
-        };
-        
-    
-        const VkApplicationInfo vkApplInfo 
-        {
-                VK_STRUCTURE_TYPE_APPLICATION_INFO,
-                VK_NULL_HANDLE,
-                "SimpleImageView",
-                vkVer,
-                "No Engine",
-                vkVer,
-                vkVer
-        };
-        
-        
-  
-        
-  
-        const VkInstanceCreateInfo InstCreateInfo 
-        {
-                .sType                          = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-                .pNext                          = ENABLE_VALIDATION_LAYERS ? &extValidationFeatures : nullptr,
-                .pApplicationInfo               = &vkApplInfo,
-                .enabledLayerCount              = ENABLE_VALIDATION_LAYERS ? 1u : 0u,
-                .ppEnabledLayerNames            = ENABLE_VALIDATION_LAYERS ? &validationLayers : nullptr,
-                .enabledExtensionCount          = static_cast<uint32_t>(( extensions.size() )),
-                .ppEnabledExtensionNames        = extensions.begin(),
-
-        };
-
-        //auto vki = nullptr;
-        VkInstance vki;
-        vkCreateInstance(&InstCreateInfo, nullptr, &vki);
-
-        return vki;
-}
 const VkInstance instance = createInstance();
 
 auto getPhyDevProps(VkPhysicalDevice physDevice) -> VkPhysicalDeviceProperties
@@ -202,7 +189,7 @@ auto createDevice() -> GPUDevice
                 .queueCreateInfoCount=deviceQueueCreateInfos.size(),
                 .pQueueCreateInfos=deviceQueueCreateInfos.data(),
                 // .enabledLayerCount=1,
-                .ppEnabledLayerNames= ENABLE_VALIDATION_LAYERS  ? &validationLayers : nullptr,
+                .ppEnabledLayerNames= DEBUG  ? &validationLayers : nullptr,
                 .enabledExtensionCount= 1,
                 .ppEnabledExtensionNames=&deviceExtensions,
                 .pEnabledFeatures= &deviceFeatures2.features

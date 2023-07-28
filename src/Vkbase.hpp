@@ -126,4 +126,4 @@ constexpr void chkTst(int buh = 0) noexcept
 [[nodiscard, gnu::const]] auto getVer()  noexcept -> uint32_t;
 [[nodiscard, gnu::const]] auto createDevice() -> GPUDevice;
 
-const uint32_t vkVer = getVer();
+const uint32_t vkVersion = getVer();

@@ -9,7 +9,7 @@ add_compile_definitions(SimpleImageViewer PRIVATE WIN32_LEAN_AND_MEAN VK_USE_PLA
 target_compile_features(SimpleImageViewer PRIVATE cxx_std_23)
 # target_compile_features(SimpleImageViewer PRIVATE c_std_23)
 target_link_options(SimpleImageViewer PRIVATE -static-libstdc++)
-target_compile_options(SimpleImageViewer PRIVATE -march=native -mtune=native -save-temps -masm=intel -Ofast -fno-char8_t -fno-exceptions -Wuninitialized -Weffc++)
+target_compile_options(SimpleImageViewer PRIVATE -march=native -mtune=native -fenable-matrix -save-temps -masm=intel -Ofast -fno-char8_t -fno-exceptions -Wuninitialized -Weffc++)
 
 	target_sources(SimpleImageViewer
 		PRIVATE
@@ -30,6 +30,7 @@ target_compile_options(SimpleImageViewer PRIVATE -march=native -mtune=native -sa
 			"src/vec_u8string_view.hpp"
 			"src/ComputePipeline.hpp"
 			"src/VkCommSet.hpp"
+			"src/mat4.hpp"
 			
 		PRIVATE	
 			"src/main.cpp"
@@ -45,6 +46,7 @@ target_compile_options(SimpleImageViewer PRIVATE -march=native -mtune=native -sa
 			"src/imgLud.cpp"
 			"src/ComputePipeline.cpp"
 			"src/vec_u8string_view.cpp"
+			"src/mat4.cpp"
 			
 	)
 	find_package(Vulkan REQUIRED)
